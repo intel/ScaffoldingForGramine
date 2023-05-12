@@ -1,0 +1,4 @@
+- hosts: all
+  roles:
+    - role: fetch-sphinx-output
+      sphinx_build_dir: Documentation/_build

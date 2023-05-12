@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/default.mk
+
+%:
+	dh $@ --buildsystem=pybuild
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf Documentation/_build
+
+override_dh_auto_build:
+	dh_auto_build
+	for builder in html man; do \
+		python3 -m sphinx -b $$builder -n Documentation Documentation/_build/$$builder; \
+	done

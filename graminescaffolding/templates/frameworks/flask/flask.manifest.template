@@ -1,0 +1,93 @@
+{% raw -%}
+loader.entrypoint = "file:{{ gramine.libos }}"
+loader.argv = ["sh", "-c",
+"""
+/usr/bin/uwsgi \
+    --uwsgi-socket /uwsgi.socket \
+    --manage-script-name \
+    --logto /dev/null \
+    --chdir /app \
+    --plugin python38 \
+    --mount /=app:app \
+    &
+/usr/bin/gramine-ratls /tmp/crt.pem /tmp/key.pem -- /usr/sbin/nginx -p /etc/nginx -c nginx.conf
+"""
+]
+
+libos.entrypoint = "/bin/sh"
+
+loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib/x86_64-linux-gnu"
+loader.env.PYTHONDONTWRITEBYTECODE = "1"
+
+loader.uid = 65534
+loader.gid = 65534
+
+fs.mounts = [
+    { path = "/bin", uri = "file:/bin" },
+    { path = "/sbin", uri = "file:/sbin" },
+
+    { path = "/usr/bin/", uri = "file:/usr/bin/" },
+    { path = "/usr/sbin/", uri = "file:/usr/sbin/" },
+
+    { path = "/usr/bin/gramine-ratls", uri = "file:/usr/bin/gramine-ratls" },
+
+    { path = "/etc/nginx/nginx.conf", uri = "file:/confs/nginx.conf" },
+    { path = "/app", uri = "file:/app/" },
+
+    { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+    { path = "/usr/lib", uri = "file:/usr/lib" },
+
+    { path = "/tmp", type = "tmpfs" },
+    { path = "/tmp/nginx/body", type = "tmpfs" },
+    { path = "/tmp/nginx/fastcgi", type = "tmpfs" },
+    { path = "/tmp/nginx/proxy", type = "tmpfs" },
+    { path = "/tmp/nginx/scgi", type = "tmpfs" },
+    { path = "/tmp/nginx/uwsgi", type = "tmpfs" },
+]
+
+sgx.remote_attestation = "dcap"
+sgx.debug = true
+
+sgx.trusted_files = [
+    "file:{{ gramine.libos }}",
+    "file:{{ gramine.runtimedir() }}/",
+
+    "file:/app/",
+    "file:/confs/nginx.conf",
+
+    "file:/usr/bin/gramine-ratls",
+    "file:/bin/sh",
+    "file:/bin/uname",
+    "file:/usr/bin/uwsgi",
+    "file:/usr/sbin/nginx",
+
+    "file:/usr/lib/python3.8/",
+    "file:/usr/lib/python3/",
+
+    "file:/usr/lib/x86_64-linux-gnu/libcap.so.2",
+    "file:/usr/lib/x86_64-linux-gnu/libcrypt.so.1",
+    "file:/usr/lib/x86_64-linux-gnu/libcrypto.so.1.1",
+    "file:/usr/lib/x86_64-linux-gnu/libexpat.so.1",
+    "file:/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "file:/usr/lib/x86_64-linux-gnu/libicudata.so.66",
+    "file:/usr/lib/x86_64-linux-gnu/libicuuc.so.66",
+    "file:/usr/lib/x86_64-linux-gnu/libjansson.so.4",
+    "file:/usr/lib/x86_64-linux-gnu/liblzma.so.5",
+    "file:/usr/lib/x86_64-linux-gnu/libpcre.so.3",
+    "file:/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0",
+    "file:/usr/lib/x86_64-linux-gnu/libssl.so.1.1",
+    "file:/usr/lib/x86_64-linux-gnu/libstdc++.so.6",
+    "file:/usr/lib/x86_64-linux-gnu/libuuid.so.1",
+    "file:/usr/lib/x86_64-linux-gnu/libxml2.so.2",
+    "file:/usr/lib/x86_64-linux-gnu/libyaml-0.so.2",
+    "file:/usr/lib/x86_64-linux-gnu/libz.so.1",
+    "file:/usr/lib/x86_64-linux-gnu/libmpdec.so.2",
+    "file:/usr/lib/x86_64-linux-gnu/libbz2.so.1.0",
+
+    "file:/usr/lib/uwsgi/plugins/python38_plugin.so",
+    "file:/usr/lib/x86_64-linux-gnu/libpython3.8.so.1.0",
+
+{% endraw %}
+{% block trusted_files %}
+{% endblock %}
+]

@@ -1,0 +1,29 @@
+- hosts: all
+
+  tasks:
+    - name: Generate RSA-3072 private key
+      command: gramine-sgx-gen-private-key -f
+
+    - name: Install scaffolding into venv
+      pip:
+        name: .
+        virtualenv: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv'
+        virtualenv_command: python3 -m venv
+        virtualenv_site_packages: true
+      args:
+        chdir: '{{ zuul.project.src_dir }}'
+
+    - name: Run example
+      command: ./run-test
+      args:
+        chdir: '{{ zuul.project.src_dir }}/examples/{{ example }}'
+      environment:
+        PATH: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin:{{ ansible_env.PATH }}'
+
+    - name: Run hadolint
+      command: ./run-hadolint --ignore DL3008
+      args:
+        chdir: '{{ zuul.project.src_dir }}/examples/{{ example }}'
+      environment:
+        PATH: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin:{{ ansible_env.PATH }}'
+

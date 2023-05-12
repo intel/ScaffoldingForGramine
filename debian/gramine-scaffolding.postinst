@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+#DEBHELPER#
+
+if test "$1" = configure
+then
+    scag-detect || :
+fi

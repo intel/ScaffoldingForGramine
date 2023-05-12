@@ -1,0 +1,33 @@
+- hosts: all
+
+  tasks:
+    - name: Build deb package
+      command: debuild --no-lintian
+      args:
+        chdir: '{{ zuul.project.src_dir }}'
+
+    - name: Run lintian
+      command: ./run-lintian
+      args:
+        chdir: '{{ zuul.project.src_dir }}'
+
+    # TODO create and upload repo, not individual files
+
+    - name: Copy artifacts
+      args:
+        chdir: '{{ zuul.project.src_dir }}/..'
+      shell: |
+        install -D -t {{ ansible_user_dir }}/zuul-output/logs/pkg-deb \
+          *.changes \
+          *.dsc \
+          *.tar* \
+          *.deb \
+          *.buildinfo
+
+    - name: Return pkg-deb artifacts to zuul
+      zuul_return:
+        data:
+          zuul:
+            artifacts:
+              - name: pkg-deb
+                url: 'pkg-deb/'

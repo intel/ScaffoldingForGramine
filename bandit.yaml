@@ -1,0 +1,29 @@
+exclude_dirs:
+  - ./.pybuild/
+  - ./build/
+  - ./debian/
+  - ./tests/
+
+skips:
+  # https://bandit.readthedocs.io/en/latest/blacklists/blacklist_imports.html#b404-import-subprocess 
+  # We have duly considered possible security implications of importing
+  # subprocess and concluded that there are in fact no implications in this
+  # project.
+  # We treat security very seriously.
+  - B404
+
+  # https://bandit.readthedocs.io/en/latest/plugins/b603_subprocess_without_shell_equals_true.html
+  # Yeah, we run commands with subprocess, so what.
+  - B603
+
+  # https://bandit.readthedocs.io/en/latest/plugins/b607_start_process_with_partial_path.html
+  # We use docker and is-sgx-avaliable as provided by external packages. We rely
+  # on properly configured $PATH for that, which is perfectly normal.
+  - B607
+
+  # https://bandit.readthedocs.io/en/latest/plugins/b701_jinja2_autoescape_false.html
+  # Jinja's autoescape is specific to HTML, and we mostly render Dockerfiles and
+  # other configs, so having autoescape is at best useless, and at worst adds
+  # cognitive load to developers who would have keep in mind which templates are
+  # autoescaped and which aren't.
+  - B701

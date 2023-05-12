@@ -1,0 +1,7 @@
+{% extends 'gramine.scaffolding.toml' %}
+
+{% block framework %}
+application = "{{ application }}"
+{% endblock %}
+
+{#- vim: set ft=jinja : #}

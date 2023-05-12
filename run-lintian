@@ -1,0 +1,3 @@
+#!/bin/sh
+
+lintian --default-display-level --display-level ">=pedantic" --fail-on "error,warning"

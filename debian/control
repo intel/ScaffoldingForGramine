@@ -1,0 +1,39 @@
+Source: gramine-scaffolding
+Priority: optional
+Maintainer: Wojtek Porczyk <woju@invisiblethingslab.com>
+Standards-Version: 4.6.1
+Section: misc
+Build-Depends: debhelper-compat (= 13),
+ dh-sequence-python3,
+ dh-sequence-sphinxdoc,
+ dh-python (>= 5),
+ bandit,
+ python3,
+ python3-pytest,
+ python3-sphinx-rtd-theme,
+ python3-setuptools (>= 66),
+ pybuild-plugin-pyproject,
+
+Package: gramine-scaffolding
+Architecture: amd64
+Description: framework for quick development of Gramine apps
+ TBD
+Depends:
+ gramine,
+ python3,
+ python3-click,
+ python3-jinja2,
+ python3-tomli,
+ ${python3:Depends},
+ ${misc:Depends},
+
+Package: gramine-scaffolding-doc
+Architecture: all
+Description: documentation for Gramine Scaffolding
+ HTML documentation for Gramine Scaffolding
+Section: doc
+Depends:
+ ${misc:Depends},
+ ${sphinxdoc:Depends},
+Built-Using:
+ ${sphinxdoc:Built-Using},

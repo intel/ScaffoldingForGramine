@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "graminescaffolding"
+version = "0a0"
+authors = [
+    { name = "Wojtek Porczyk", email = "woju@invisiblethingslab.com" },
+    { name = "Mariusz Zaborski", email = "oshogobo@invisiblethingslab.com" },
+]
+readme = "README.rst"
+
+[project.entry-points.console_scripts]
+scag-build = "graminescaffolding.__main__:build"
+scag-detect = "graminescaffolding.__main__:_detect"
+scag-setup = "graminescaffolding.__main__:setup"
+scag-quickstart = "graminescaffolding.__main__:quickstart"
+
+[project.entry-points."gramine.scaffolding.framework"]
+python_plain = "graminescaffolding.frameworks.python_plain.builder:builder_python"
+flask = "graminescaffolding.frameworks.flask.builder:builder_flask"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["graminescaffolding", "graminescaffolding.*"]

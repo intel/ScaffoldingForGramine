@@ -1,0 +1,85 @@
+- job:
+    name: build-deb
+    nodeset: any
+    attempts: 1
+    run: .zuul.d/playbooks/build-deb/run.yaml
+    provides: pkg-deb
+
+- job:
+    name: build-docs
+    nodeset: any
+    attempts: 1
+    run: .zuul.d/playbooks/build-docs/run.yaml
+    post-run: .zuul.d/playbooks/build-docs/post.yaml
+
+- job:
+    name: bandit
+    parent: run-test-command
+    nodeset: any
+    vars:
+      test_command: ./run-bandit
+    attempts: 1
+
+- job:
+    name: pylint
+    parent: run-test-command
+    nodeset: any
+    vars:
+      test_command: ./run-pylint
+    attempts: 1
+
+- job:
+    name: pytest
+    parent: run-test-command
+    nodeset: any
+    vars:
+      test_command: ./run-pytest
+    attempts: 1
+
+- job:
+    name: scaffolding-example
+    nodeset: any
+    run: .zuul.d/playbooks/scaffolding-example/run.yaml
+    abstract: true
+
+- job:
+    name: example-python
+    parent: scaffolding-example
+    vars:
+      example: python
+
+- job:
+    name: example-flask
+    parent: scaffolding-example
+    vars:
+      example: flask
+
+- project:
+    name: woju/gramine-scaffolding
+    check:
+      jobs:
+        - bandit
+        - pylint
+        - pytest
+        - build-deb
+        - build-docs
+        - example-python
+        - example-flask
+
+- nodeset:
+    name: plain
+    nodes:
+      - label: plain
+        name: controller
+
+- nodeset:
+    name: sgx
+    nodes:
+      - label: sgx
+        name: controller
+
+- nodeset:
+    name: any
+    alternatives:
+      - sgx
+      - plain

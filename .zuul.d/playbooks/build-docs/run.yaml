@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - name: Build docs
+      command: python3 -m sphinx -b html -n Documentation Documentation/_build/html
+      args:
+        chdir: '{{ zuul.project.src_dir }}'
