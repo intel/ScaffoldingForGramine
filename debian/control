@@ -9,10 +9,14 @@ Build-Depends: debhelper-compat (= 13),
  dh-python (>= 5),
  bandit,
  python3,
- python3-pytest,
  python3-sphinx-rtd-theme,
  python3-setuptools (>= 66),
  pybuild-plugin-pyproject,
+# needed for dh_auto_test's run of pytest
+ python3-pytest,
+ python3-click,
+ python3-tomli,
+ python3-tomli-w,
 
 Package: gramine-scaffolding
 Architecture: amd64
@@ -24,6 +28,7 @@ Depends:
  python3-click,
  python3-jinja2,
  python3-tomli,
+ python3-tomli-w,
  ${python3:Depends},
  ${misc:Depends},
 

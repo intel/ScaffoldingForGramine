@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=66"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -10,6 +10,12 @@ authors = [
     { name = "Mariusz Zaborski", email = "oshogobo@invisiblethingslab.com" },
 ]
 readme = "README.rst"
+dependencies = [
+    "Jinja2",
+    "click",
+    "tomli",
+    "tomli-w",
+]
 
 [project.entry-points.console_scripts]
 scag-build = "graminescaffolding.__main__:build"
