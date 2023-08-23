@@ -22,6 +22,26 @@ class GramineStorePrompt(click.Option):
     def restore_prompt(self):
         self.prompt = self.default_prompt
 
+class GramineNumberObtions(GramineStorePrompt):
+    def prompt_for_value(self, ctx):
+        if not hasattr(self.type, 'choices') or not self.type.choices:
+            return super().prompt_for_value(ctx)
+
+        click.echo(f'{self.prompt}')
+        for idx, name in enumerate(self.type.choices, 1):
+            click.echo(f'{idx} - {name}')
+
+        while True:
+            choice = click.prompt('Please provide a number or name')
+            try:
+                return self.type.choices[int(choice) - 1]
+            except ValueError:
+                for name in self.type.choices:
+                    if name == choice:
+                        return name
+            except IndexError:
+                click.echo('Invalid option. Try Again.')
+
 def gramine_option_prompt(*param_decls, **attrs):
     """
     This decorator disables the prompt in an option. You can manually enable
@@ -33,6 +53,16 @@ def gramine_option_prompt(*param_decls, **attrs):
     interactive version of the setup.
     """
     return click.option(*param_decls, **attrs, cls=GramineStorePrompt)
+
+def gramine_option_numerical_prompt(*param_decls, **attrs):
+    """
+    This decorator enhances the gramine_option_prompt class; for initial guidance,
+    consult that orginal class.
+
+    The distinction here lies in the acceptance of prompt options in two formats:
+    by name and through a sequence number.
+    """
+    return click.option(*param_decls, **attrs, cls=GramineNumberObtions)
 
 def gramine_enable_prompts(func):
     """
