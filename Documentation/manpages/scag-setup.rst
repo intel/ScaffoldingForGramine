@@ -21,6 +21,11 @@ The file contains all necessary information required to build the project.
 Options
 =======
 
+.. option:: --bootstrap
+
+    Initialize an empty directory with an example application from
+    the given framework.
+
 .. option:: --framework <framework>
 
     The framework used by the scaffolded application.

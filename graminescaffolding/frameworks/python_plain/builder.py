@@ -19,6 +19,10 @@ class PythonBuilder(GramineBuilder):
         return {'application': self.application}
 
     @staticmethod
+    def bootstrap_defaults():
+        return ['--application=hello_world.py']
+
+    @staticmethod
     def cmdline_setup_parser(project_dir, sgx, sgx_key):
         @click.command()
         @gramine_option_prompt('--application', required=True, type=str,
