@@ -22,7 +22,7 @@ class GramineStorePrompt(click.Option):
     def restore_prompt(self):
         self.prompt = self.default_prompt
 
-class GramineNumberObtions(GramineStorePrompt):
+class GramineNumberOptions(GramineStorePrompt):
     def prompt_for_value(self, ctx):
         if not hasattr(self.type, 'choices') or not self.type.choices:
             return super().prompt_for_value(ctx)
@@ -62,7 +62,7 @@ def gramine_option_numerical_prompt(*param_decls, **attrs):
     The distinction here lies in the acceptance of prompt options in two formats:
     by name and through a sequence number.
     """
-    return click.option(*param_decls, **attrs, cls=GramineNumberObtions)
+    return click.option(*param_decls, **attrs, cls=GramineNumberOptions)
 
 def gramine_enable_prompts(func):
     """
