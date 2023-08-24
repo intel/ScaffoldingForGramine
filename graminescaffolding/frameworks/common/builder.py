@@ -10,6 +10,8 @@ import click
 import tomli
 import tomli_w
 
+from pkg_resources import resource_listdir, resource_isdir
+
 from ... import templates
 from ...utils import gramine_enable_prompts
 from .toolchain import get_toolchain
@@ -43,8 +45,12 @@ class GramineBuilder:
         return templates.get_template(f'frameworks/{fname}/gramine.scaffolding.toml')
 
     @classmethod
-    def cmdline_setup(cls, prompts_enabled, project_dir, sgx, sgx_key, **kwargs):
+    #pylint: disable=too-many-arguments
+    def cmdline_setup(cls, prompts_enabled, bootstrap, project_dir, sgx,
+        sgx_key, **kwargs):
         parser = cls.cmdline_setup_parser(project_dir, sgx, sgx_key)
+        if bootstrap:
+            kwargs['args'] = cls.bootstrap_defaults()
         if prompts_enabled:
             return gramine_enable_prompts(parser)(**kwargs)
         return parser(**kwargs)
@@ -113,3 +119,29 @@ class GramineBuilder:
         templ = tomli_w.dumps(tomli.loads(templ))
         with open(filename, 'w', encoding='utf8') as gramine_conf:
             gramine_conf.write(templ)
+
+    def bootstrap_framework_directory(self, curdir):
+        jinja_curdir = os.path.join('frameworks', self.get_framework_name(),
+            'example', curdir)
+        package_curdir = os.path.join('..', '..', 'templates', jinja_curdir)
+        project_curdir = os.path.join(self.project_dir, curdir)
+
+        os.makedirs(project_curdir, exist_ok=True)
+
+        for name in resource_listdir(__package__, package_curdir):
+            if resource_isdir(__package__, os.path.join(package_curdir, name)):
+                self.bootstrap_framework_directory(os.path.join(curdir, name))
+                continue
+
+            with open(os.path.join(project_curdir, name), 'w',
+                encoding='utf8') as file:
+                file.write(
+                    templates.get_template(os.path.join(jinja_curdir, name)).render()
+                )
+
+    def bootstrap_framework(self):
+        return self.bootstrap_framework_directory("")
+
+    @staticmethod
+    def bootstrap_defaults():
+        return ()

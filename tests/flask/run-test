@@ -5,6 +5,7 @@ set name expect-[pid]
 spawn scag-setup \
     --framework flask \
     --project_dir app \
+    --bootstrap \
     --sgx 1
 
 lassign [wait] pid spawnid os_error_flag value

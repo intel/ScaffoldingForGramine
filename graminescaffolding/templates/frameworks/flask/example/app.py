@@ -1,3 +1,4 @@
+{% raw -%}
 import flask
 
 app = flask.Flask(__name__)
@@ -9,3 +10,4 @@ def index():
 <title>hello, flask</title>
 <h1>hello, flask</h1>
 '''
+{% endraw %}
