@@ -17,6 +17,7 @@ Description
 This command is used to configure the Scaffolding project.
 As an output, the configuration file is generated.
 The file contains all necessary information required to build the project.
+Each framework can define additional specific for it options.
 
 Options
 =======
@@ -49,6 +50,13 @@ Options
 .. option:: --project_dir <dir>
 
     The directory of the application to scaffold.
+
+Python Options
+==============
+
+.. option:: --application
+
+    Python application main script.
 
 Files
 =====

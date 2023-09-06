@@ -26,6 +26,7 @@ class PythonBuilder(GramineBuilder):
     def cmdline_setup_parser(project_dir, sgx, sgx_key):
         @click.command()
         @gramine_option_prompt('--application', required=True, type=str,
+            help="Python application main script.",
             prompt="Which script is the main one")
         def click_parser(application):
             return PythonBuilder(project_dir, sgx, sgx_key, application)
