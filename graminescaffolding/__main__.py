@@ -13,7 +13,8 @@ import tomli
 import click
 
 from .frameworks.common.builder import GramineBuilder
-from .utils import gramine_enable_prompts, gramine_option_prompt
+from .utils import (gramine_enable_prompts, gramine_option_prompt,
+    gramine_option_numerical_prompt)
 
 FRAMEWORK_ENTRY_POINTS_GROUP = 'gramine.scaffolding.framework'
 
@@ -68,7 +69,9 @@ def list_framework():
     """
     # TODO after python (>=3.10): remove disable
     # pylint: disable=unexpected-keyword-arg
-    return [entry.name for entry in entry_points(group=FRAMEWORK_ENTRY_POINTS_GROUP)]
+    return sorted([
+        entry.name for entry in entry_points(group=FRAMEWORK_ENTRY_POINTS_GROUP)
+    ])
 
 def load_framework(name):
     """
@@ -123,7 +126,7 @@ def quickstart():
 
 
 @main.command('setup', context_settings={'ignore_unknown_options': True})
-@gramine_option_prompt('--framework', required=True,
+@gramine_option_numerical_prompt('--framework', required=True,
     type=click.Choice(list_framework()), prompt='Which framework you want to use?',
     help='The framework used by the scaffolded application.')
 @gramine_option_prompt('--sgx',
