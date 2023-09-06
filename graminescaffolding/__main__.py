@@ -13,18 +13,8 @@ import tomli
 import click
 
 from .frameworks.common.builder import GramineBuilder
-from .utils import (gramine_enable_prompts, gramine_option_prompt,
-    gramine_option_numerical_prompt)
-
-FRAMEWORK_ENTRY_POINTS_GROUP = 'gramine.scaffolding.framework'
-
-# TODO: after python (>= 3.10) simplify this
-# NOTE: we can't `try: importlib.metadata`, because the API has changed between 3.9 and 3.10
-# (in 3.9 and in backported importlib_metadata entry_points() doesn't accept group argument)
-if sys.version_info >= (3, 10):
-    from importlib.metadata import entry_points # pylint: disable=import-error,no-name-in-module
-else:
-    from pkg_resources import iter_entry_points as entry_points
+from .utils import (GramineExtendedSetupHelp, gramine_enable_prompts, gramine_list_frameworks,
+    gramine_load_framework, gramine_option_numerical_prompt, gramine_option_prompt)
 
 def detect(quiet=False):
     """
@@ -59,33 +49,6 @@ def get_default_sgx_key():
         os.path.expanduser('~'),
         ".config/gramine/enclave-key.pem",
     )
-
-def list_framework():
-    """
-    List available frameworks (like python, flask itp.).
-
-    Returns:
-        list: list of available frameworks
-    """
-    # TODO after python (>=3.10): remove disable
-    # pylint: disable=unexpected-keyword-arg
-    return sorted([
-        entry.name for entry in entry_points(group=FRAMEWORK_ENTRY_POINTS_GROUP)
-    ])
-
-def load_framework(name):
-    """
-    Load framework by name.
-
-    Returns:
-        class: framework class
-    """
-    # TODO after python (>=3.10): remove disable
-    # pylint: disable=unexpected-keyword-arg
-    for entry in entry_points(group=FRAMEWORK_ENTRY_POINTS_GROUP):
-        if entry.name == name:
-            return entry.load()
-    raise KeyError(name)
 
 @click.group()
 def main():
@@ -125,9 +88,11 @@ def quickstart():
     builder.get_toolchain().run_docker(docker_id)
 
 
-@main.command('setup', context_settings={'ignore_unknown_options': True})
+@main.command('setup', context_settings={'ignore_unknown_options': True},
+    cls=GramineExtendedSetupHelp)
 @gramine_option_numerical_prompt('--framework', required=True,
-    type=click.Choice(list_framework()), prompt='Which framework you want to use?',
+    type=click.Choice(gramine_list_frameworks()),
+    prompt='Which framework you want to use?',
     help='The framework used by the scaffolded application.')
 @gramine_option_prompt('--sgx',
     default=False, type=bool, prompt='Do you want to use SGX?',
@@ -153,7 +118,7 @@ def setup(ctx, framework, sgx, sgx_key, project_dir, setup_args):
         print(f'Project dir ({project_dir}) is not a directory')
         sys.exit(1)
 
-    load_framework(framework)().cmdline_setup(
+    gramine_load_framework(framework)().cmdline_setup(
         getattr(ctx.command, 'prompts_enabled', False),
         project_dir, sgx, sgx_key, args=setup_args, standalone_mode=False
     ).generate_config()
@@ -199,7 +164,7 @@ def build_step(project_dir, filename, sgx_key):
     with open(conffile, encoding='utf8') as f_conffile:
         data = tomli.loads(f_conffile.read())
 
-    builder = load_framework(data['application']['framework'])().toml_setup(
+    builder = gramine_load_framework(data['application']['framework'])().toml_setup(
         project_dir, sgx_key, data)
     return builder.build(), builder
 
