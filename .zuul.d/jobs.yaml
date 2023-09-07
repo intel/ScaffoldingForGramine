@@ -54,6 +54,12 @@
     vars:
       example: flask
 
+- job:
+    name: example-nodejs
+    parent: scaffolding-example
+    vars:
+      example: node
+
 - project:
     name: woju/gramine-scaffolding
     check:

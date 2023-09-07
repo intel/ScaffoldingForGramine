@@ -1,0 +1,32 @@
+#!/usr/bin/expect -f
+
+spawn scag-setup \
+    --framework nodejs_plain \
+    --project_dir app \
+    --bootstrap \
+    --sgx 1
+
+lassign [wait] pid spawnid os_error_flag value
+
+if {$os_error_flag == 0} {
+    puts "exit status: $value"
+} else {
+    puts "errno: $value"
+    exit 1
+}
+
+spawn scag-build --project_dir app --print-only-image
+
+expect {
+    -re {^sha256:([0-9a-f]+)} {
+	set image $expect_out(1,string)
+    }
+    eof { exit 1 }
+}
+
+spawn docker run -it --rm --device /dev/sgx_enclave "$image"
+
+expect {
+    "Hello world!" { exit 0 }
+    eof { exit 1 }
+}
