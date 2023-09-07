@@ -34,6 +34,7 @@ Options
 
     - Plain Python
     - Flask
+    - Node.js
 
 
 .. option:: --sgx
@@ -52,6 +53,13 @@ Options
     The directory of the application to scaffold.
 
 Python Options
+==============
+
+.. option:: --application
+
+    Python application main script.
+
+Node.js Options
 ==============
 
 .. option:: --application
