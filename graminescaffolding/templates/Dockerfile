@@ -10,6 +10,7 @@ WORKDIR /app
 {% block confs %}
 {% endblock %}
 
+RUN apt-get update
 {% block install %}
 {% endblock %}
 
