@@ -37,22 +37,22 @@
     attempts: 1
 
 - job:
-    name: scaffolding-example
+    name: scaffolding-test
     nodeset: any
-    run: .zuul.d/playbooks/scaffolding-example/run.yaml
+    run: .zuul.d/playbooks/scaffolding-test/run.yaml
     abstract: true
 
 - job:
-    name: example-python
-    parent: scaffolding-example
+    name: test-python
+    parent: scaffolding-test
     vars:
-      example: python
+      test: python
 
 - job:
-    name: example-flask
-    parent: scaffolding-example
+    name: test-flask
+    parent: scaffolding-test
     vars:
-      example: flask
+      test: flask
 
 - project:
     name: woju/gramine-scaffolding
@@ -63,8 +63,8 @@
         - pytest
         - build-deb
         - build-docs
-        - example-python
-        - example-flask
+        - test-python
+        - test-flask
 
 - nodeset:
     name: plain
