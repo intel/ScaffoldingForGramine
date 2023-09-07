@@ -3,7 +3,7 @@
 spawn scag-setup \
     --framework python_plain \
     --project_dir app \
-    --application hello_world.py \
+    --bootstrap \
     --sgx 1
 
 lassign [wait] pid spawnid os_error_flag value

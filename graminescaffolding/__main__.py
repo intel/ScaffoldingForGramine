@@ -124,6 +124,42 @@ def quickstart():
         return
     builder.get_toolchain().run_docker(docker_id)
 
+def setup_handle_project_dir(ctx, project_dir, bootstrap):
+    def prompt_version(project_dir):
+        if not os.path.exists(project_dir):
+            if click.confirm('The project directory doesn\'t exist. Do you want '
+                'to bootstrap a framework example?'):
+                return True
+            raise ValueError('Project directory doesn\'t exist, aborting.')
+
+        if not os.path.isdir(project_dir):
+            raise ValueError('Project directory has to be a directory.')
+
+        if len(os.listdir(project_dir)) == 0:
+            if click.confirm('The project directory seems to be empty. '
+                'Do you want to bootstrap the framework example?'):
+                return True
+        return False
+
+    def cli_version(project_dir, bootstrap):
+        if not os.path.exists(project_dir):
+            if not bootstrap:
+                raise ValueError('The directory doesn\'t exist. Please create a '
+                    'directory or use the --bootstrap option.')
+            return bootstrap
+
+        if not os.path.isdir(project_dir):
+            raise ValueError('The project directory must be a valid directory.')
+
+        if len(os.listdir(project_dir)) != 0 and bootstrap:
+            raise ValueError('The project directory must be empty in order to '
+                'bootstrap it.')
+
+        return bootstrap
+
+    if getattr(ctx.command, 'prompts_enabled', False):
+        return prompt_version(project_dir)
+    return cli_version(project_dir, bootstrap)
 
 @main.command('setup', context_settings={'ignore_unknown_options': True})
 @gramine_option_numerical_prompt('--framework', required=True,
@@ -138,9 +174,11 @@ def quickstart():
 @gramine_option_prompt('--project_dir', required=True, type=str,
     default=os.getcwd(), prompt='Your\'s app directory is',
     help='The directory of the application to scaffold.')
+@gramine_option_prompt('--bootstrap', required=False, is_flag=True,
+    default=False, help='Bootstrap directory with framework example.')
 @click.argument('setup_args', nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
-def setup(ctx, framework, sgx, sgx_key, project_dir, setup_args):
+def setup(ctx, framework, sgx, sgx_key, project_dir, bootstrap, setup_args):
     """
     Build Gramine application using Scaffolding framework.
 
@@ -149,14 +187,19 @@ def setup(ctx, framework, sgx, sgx_key, project_dir, setup_args):
              set to obj:`False`
     """
 
-    if not os.path.isdir(project_dir):
-        print(f'Project dir ({project_dir}) is not a directory')
+    try:
+        bootstrap = setup_handle_project_dir(ctx, project_dir, bootstrap)
+    except ValueError as err:
+        print(f'Error: {err}')
         sys.exit(1)
 
-    load_framework(framework)().cmdline_setup(
-        getattr(ctx.command, 'prompts_enabled', False),
+    framework = load_framework(framework)().cmdline_setup(
+        getattr(ctx.command, 'prompts_enabled', False), bootstrap,
         project_dir, sgx, sgx_key, args=setup_args, standalone_mode=False
-    ).generate_config()
+    )
+    if bootstrap:
+        framework.bootstrap_framework()
+    framework.generate_config()
     return project_dir
 
 @main.command('build')
