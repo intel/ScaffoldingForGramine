@@ -13,17 +13,17 @@
       args:
         chdir: '{{ zuul.project.src_dir }}'
 
-    - name: Run example
+    - name: Run test
       command: ./run-test
       args:
-        chdir: '{{ zuul.project.src_dir }}/examples/{{ example }}'
+        chdir: '{{ zuul.project.src_dir }}/tests/{{ test }}'
       environment:
         PATH: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin:{{ ansible_env.PATH }}'
 
     - name: Run hadolint
       command: ./run-hadolint --ignore DL3008
       args:
-        chdir: '{{ zuul.project.src_dir }}/examples/{{ example }}'
+        chdir: '{{ zuul.project.src_dir }}/tests/{{ test }}'
       environment:
         PATH: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin:{{ ansible_env.PATH }}'
 
