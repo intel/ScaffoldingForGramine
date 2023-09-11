@@ -45,7 +45,7 @@ Then:
 
 .. code-block:: sh
 
-    sudo apt-get install python3-pip
+    sudo apt-get install docker.io python3-pip
     python3 -m venv .venv
     source .venv/bin/activate
     python3 -m pip install .
@@ -56,7 +56,7 @@ Development (editable install into virtualenv)
 
 .. code-block:: sh
 
-    sudo apt-get install python3-venv
+    sudo apt-get install gramine docker.io python3-venv
     python3 -m venv --system-site-packages .venv
     source .venv/bin/activate
     pip install --editable .
