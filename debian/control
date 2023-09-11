@@ -23,6 +23,7 @@ Architecture: amd64
 Description: framework for quick development of Gramine apps
  TBD
 Depends:
+ docker.io,
  gramine,
  python3,
  python3-click,
