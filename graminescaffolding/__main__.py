@@ -159,7 +159,7 @@ def setup(ctx, framework, sgx, sgx_key, project_dir, bootstrap, setup_args):
         sys.exit(1)
 
     framework = gramine_load_framework(framework)().cmdline_setup(
-        getattr(ctx.command, 'prompts_enabled', False),
+        getattr(ctx.command, 'prompts_enabled', False), bootstrap,
         project_dir, sgx, sgx_key, args=setup_args, standalone_mode=False,
     )
     if bootstrap:
