@@ -63,8 +63,8 @@
         - pytest
         - build-deb
         - build-docs
-        - example-python
-        - example-flask
+        - test-python
+        - test-flask
 
 - nodeset:
     name: plain
