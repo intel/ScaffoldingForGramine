@@ -55,7 +55,7 @@
       test: flask
 
 - project:
-    name: woju/gramine-scaffolding
+    name: intel/ScaffoldingForGramine
     check:
       jobs:
         - bandit
