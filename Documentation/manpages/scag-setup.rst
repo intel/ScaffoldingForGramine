@@ -35,6 +35,7 @@ Options
     - Plain Python
     - Flask
     - Node.js
+    - Express.js
     - Koa.js
     - Java JAR files
     - Java with Gradle build system
@@ -57,6 +58,17 @@ Node.js Options
 .. option:: --application
 
     Node.js application main script.
+
+Express.js
+==========
+
+.. option:: --application
+
+    Express.js application main script.
+
+.. option:: --expressjs_internal_port
+
+    Port used by Express.js application.
 
 Koa.js
 ======

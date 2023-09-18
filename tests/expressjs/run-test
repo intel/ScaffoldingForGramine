@@ -1,0 +1,57 @@
+#!/usr/bin/expect -f
+
+set name expect-[pid]
+
+spawn scag-setup \
+    --framework expressjs \
+    --project_dir app \
+    --bootstrap
+
+lassign [wait] pid spawnid os_error_flag value
+
+if {$os_error_flag == 0} {
+    puts "exit status: $value"
+} else {
+    puts "errno: $value"
+    exit 1
+}
+
+set image ""
+spawn scag-build --project_dir app --print-only-image
+
+set timeout 600
+expect {
+    -re {sha256:([0-9a-f]+)} {
+	set image $expect_out(1,string)
+    }
+    eof { exit 1 }
+}
+
+spawn docker run -it --rm \
+    --name $name \
+    --device /dev/sgx_enclave \
+    --volume /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+    --publish 8000:8000 \
+    "$image"
+
+for {set i 0} {$i < 60} {incr i} {
+	sleep 2
+	spawn docker exec $name sh -c "ss -H -4 -tuln | awk '{ print \$5 }'"
+	expect {
+	    -re "^0.0.0.0:8000" {
+		break
+	    }
+	}
+}
+
+spawn scag-client -C app \
+    --allow-outdated-tcb-insecure \
+    https://localhost:8000
+
+expect {
+    "Hello, World!" { set ret 0 }
+    eof { set ret 1 }
+}
+
+exec docker kill $name
+exit $ret
