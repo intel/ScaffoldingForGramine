@@ -61,6 +61,12 @@
       test: nodejs
 
 - job:
+    name: test-koajs
+    parent: scaffolding-tests
+    vars:
+      test: koajs
+
+- job:
     name: test-java-jar
     parent: scaffolding-tests
     vars:
@@ -90,6 +96,7 @@
         - test-python
         - test-flask
         - test-nodejs
+        - test-koajs
         - test-java-jar
         - test-java-gradle
         - test-dotnet
