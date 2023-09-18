@@ -22,6 +22,10 @@ As a result, this command produces a Docker image.
 Options
 =======
 
+.. option:: --and-run
+
+   Automatically run the application after build.
+
 .. option:: --conf <file>
 
     The filename of the scaffolding configuration file. This file is most

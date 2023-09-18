@@ -179,7 +179,9 @@ def setup(ctx, framework, sgx, sgx_key, project_dir, bootstrap, setup_args):
 @click.option('--print-only-image', is_flag=True,
     help='Print only the SHA of the produced docker image, without any'
     ' additional decorators.')
-def build(project_dir, conf, sgx_key, print_only_image):
+@click.option('--and-run', is_flag=True,
+    help='Automatically run the application after build')
+def build(project_dir, conf, sgx_key, print_only_image, and_run):
     """
     Build Gramine application using Scaffolding framework.
     """
@@ -189,6 +191,9 @@ def build(project_dir, conf, sgx_key, print_only_image):
             print(docker_id)
         else:
             print_docker_usage(docker_id, builder)
+
+    if and_run:
+        builder.get_toolchain().run_docker(docker_id)
 
 def build_step(project_dir, filename, sgx_key):
     """
