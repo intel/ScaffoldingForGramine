@@ -352,6 +352,43 @@ class NodejsBuilder(Builder):
         return click_parser
 
 
+class KoajsBuilder(Builder):
+    framework = 'koajs'
+    depends = (
+        'nodejs',
+        'npm',
+        'nginx',
+    )
+    bootstrap_defaults = (
+        '--application=index.js',
+        '--koajs_internal_port=3000',
+    )
+    extra_files = {
+        'nginx.conf': (
+            'frameworks/{framework}/nginx-koajs.conf',
+        ),
+    }
+
+    @classmethod
+    def cmdline_setup_parser(cls, project_dir):
+        @click.command()
+        @utils.gramine_option_prompt('--application', required=True, type=str,
+            prompt="Which script is the main one")
+        @utils.gramine_option_prompt('--koajs_internal_port', required=True,
+            type=int, prompt="Which port is used by koajs")
+        def click_parser(application, koajs_internal_port):
+            return cls(project_dir, {
+                'application': {
+                    'framework': cls.framework,
+                },
+                cls.framework: {
+                    'application': application,
+                    'koajs_internal_port': koajs_internal_port,
+                },
+            })
+        return click_parser
+
+
 class JavaJARBuilder(Builder):
     framework = 'java_jar'
     depends = (
