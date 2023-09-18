@@ -60,6 +60,12 @@
     vars:
       test: nodejs
 
+- job:
+    name: test-koajs
+    parent: scaffolding-tests
+    vars:
+      test: koajs
+
 - project:
     name: intel/ScaffoldingForGramine
     check:
@@ -72,6 +78,7 @@
         - test-python
         - test-flask
         - test-nodejs
+        - test-koajs
 
 - nodeset:
     name: plain

@@ -1,0 +1,8 @@
+{% extends 'gramine.scaffolding.toml' %}
+
+{% block framework %}
+application = "{{ application }}"
+koajs_internal_port = "{{ koajs_internal_port }}"
+{% endblock %}
+
+{#- vim: set ft=jinja : #}

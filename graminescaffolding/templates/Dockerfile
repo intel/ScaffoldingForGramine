@@ -17,11 +17,13 @@ WORKDIR /app
 COPY . /app
 {% endblock %}
 
+{% block post_copy_install %}
+{% endblock %}
+
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 {# dockerfile_generate_manifest -#}
-
 {%- block generate_manifest %}
 RUN gramine-manifest -Dapplication=/app/{{ application }} {{ manifest_template }} {{ manifest }}
 {% if executor == 'gramine-sgx' %}

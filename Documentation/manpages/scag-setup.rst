@@ -35,6 +35,7 @@ Options
     - Plain Python
     - Flask
     - Node.js
+    - Koa.js
 
 
 .. option:: --sgx
@@ -65,6 +66,17 @@ Node.js Options
 .. option:: --application
 
     Python application main script.
+
+Koa.js
+======
+
+.. option:: --application
+
+    Koa.js application main script.
+
+.. option:: --koajs_internal_port
+
+    Port used by Koa.js application.
 
 Files
 =====
