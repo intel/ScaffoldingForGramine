@@ -67,6 +67,12 @@
       test: koajs
 
 - job:
+    name: test-expressjs
+    parent: scaffolding-tests
+    vars:
+      test: expressjs
+
+- job:
     name: test-java-jar
     parent: scaffolding-tests
     vars:
@@ -96,6 +102,7 @@
         - test-python
         - test-flask
         - test-nodejs
+        - test-expressjs
         - test-koajs
         - test-java-jar
         - test-java-gradle
