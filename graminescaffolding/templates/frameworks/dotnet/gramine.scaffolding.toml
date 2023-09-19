@@ -3,6 +3,7 @@
 {% block framework %}
 build_config = "{{ build_config }}"
 project_file = "{{ project_file }}"
+target = "{{ target }}"
 {% endblock %}
 
 {#- vim: set ft=jinja : #}

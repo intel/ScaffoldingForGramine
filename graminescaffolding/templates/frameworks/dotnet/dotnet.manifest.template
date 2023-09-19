@@ -3,12 +3,13 @@
 loader.entrypoint = "file:{{ gramine.libos }}"
 {% endraw %}
 
-libos.entrypoint = "{{ dotnet }}/dotnet"
+libos.entrypoint = "/app/bin/{{ build_config }}/net7.0/{{ target }}"
 
 loader.pal_internal_mem_size = "128M"
 loader.log_level = "error"
 
-loader.argv = ["{{ dotnet }}/dotnet", "run", "--no-build", "--project", "/app/{{ project_file }}", "-c", "{{ build_config }}"]
+# TODO: add app-specific command line arguments
+#loader.argv =
 
 loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib/x86_64-linux-gnu"
 

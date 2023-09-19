@@ -5,7 +5,11 @@ RUN curl https://packages.microsoft.com/config/debian/12/packages-microsoft-prod
 RUN dpkg -i packages-microsoft-prod.deb
 RUN rm packages-microsoft-prod.deb
 RUN apt-get update && apt-get install -y dotnet-sdk-7.0
-RUN dotnet nuget --version
+{% endblock %}
+
+{% block copy_app %}
+COPY . /app
+RUN dotnet build -c {{ build_config }} /app/{{ project_file }}
 {% endblock %}
 
 {#- vim: set ft=jinja : #}
