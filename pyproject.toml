@@ -31,6 +31,7 @@ flask =         "graminescaffolding.builder:FlaskBuilder"
 nodejs_plain =  "graminescaffolding.builder:NodejsBuilder"
 java_jar =      "graminescaffolding.builder:JavaJARBuilder"
 java_gradle =   "graminescaffolding.builder:JavaGradleBuilder"
+dotnet =        "graminescaffolding.builder:DotnetBuilder"
 
 [tool.setuptools.packages.find]
 where = ["."]
