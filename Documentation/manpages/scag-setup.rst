@@ -30,10 +30,11 @@ Options
 .. option:: --framework <framework>
 
     The framework used by the scaffolded application.
-    Currently, we support two frameworks:
+    Currently, we support following frameworks:
 
     - Plain Python
     - Flask
+    - .NET
 
 
 .. option:: --sgx
@@ -57,6 +58,17 @@ Python Options
 .. option:: --application
 
     Python application main script.
+
+.NET Options
+==============
+
+.. option:: --build_config
+
+    Build configuration (Debug/Release)
+
+.. option:: --project_file
+
+    Application's main project file
 
 Files
 =====

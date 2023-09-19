@@ -26,6 +26,7 @@ scag-quickstart = "graminescaffolding.__main__:quickstart"
 [project.entry-points."gramine.scaffolding.framework"]
 python_plain = "graminescaffolding.frameworks.python_plain.builder:builder_python"
 flask = "graminescaffolding.frameworks.flask.builder:builder_flask"
+dotnet = "graminescaffolding.frameworks.dotnet.builder:builder_dotnet"
 
 [tool.setuptools.packages.find]
 where = ["."]
