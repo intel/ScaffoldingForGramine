@@ -1,0 +1,4 @@
+#!/bin/sh
+
+: ${HADOLINT:=docker run --rm -i hadolint/hadolint hadolint}
+$HADOLINT "$@" - < app/.scag/Dockerfile
