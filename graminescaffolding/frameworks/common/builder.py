@@ -93,7 +93,9 @@ class GramineBuilder:
         dockerfile = os.path.join(magic_dir, 'Dockerfile')
 
         with open(manifest_template, 'w', encoding='utf8') as manifest_file:
-            manifest_file.write(self.get_gramine_manifest().render())
+            manifest_file.write(self.get_gramine_manifest().render(
+                **self.get_templates_extras_vars()
+            ))
 
         with open(dockerfile, 'w', encoding='utf8') as dockerfile_file:
             dockerfile_file.write(self.get_dockerfile_template().render(
