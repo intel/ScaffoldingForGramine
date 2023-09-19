@@ -54,6 +54,12 @@
     vars:
       test: flask
 
+- job:
+    name: test-dotnet
+    parent: scaffolding-test
+    vars:
+      test: dotnet
+
 - project:
     name: intel/ScaffoldingForGramine
     check:
@@ -65,6 +71,7 @@
         - build-docs
         - test-python
         - test-flask
+        - test-dotnet
 
 - nodeset:
     name: plain
