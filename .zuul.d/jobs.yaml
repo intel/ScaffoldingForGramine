@@ -72,6 +72,12 @@
     vars:
       test: java_gradle
 
+- job:
+    name: test-dotnet
+    parent: scaffolding-test
+    vars:
+      test: dotnet
+
 - project:
     name: intel/ScaffoldingForGramine
     check:
@@ -86,6 +92,7 @@
         - test-nodejs
         - test-java-jar
         - test-java-gradle
+        - test-dotnet
 
 - nodeset:
     name: plain
