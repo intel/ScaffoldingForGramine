@@ -1,0 +1,69 @@
+{% set dotnet = '/usr/share/dotnet' -%}
+{% raw -%}
+loader.entrypoint = "file:{{ gramine.libos }}"
+{% endraw %}
+
+libos.entrypoint = "/app/bin/{{ build_config }}/net7.0/{{ target }}"
+
+loader.pal_internal_mem_size = "128M"
+loader.log_level = "error"
+
+# TODO: add app-specific command line arguments
+#loader.argv =
+
+loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib/x86_64-linux-gnu"
+
+loader.env.DOTNET_GCHeapHardLimit = "0x6400000" # TODO: adjust for the app (hex value, currently 100 MiB)
+loader.env.DOTNET_RUNNING_IN_CONTAINER = "true"
+# home dir needed for some dotnet persistency, initialized during image build
+loader.env.DOTNET_CLI_HOME = "/root/"
+
+fs.mounts = [
+{% raw -%}
+    { uri = "file:{{ gramine.runtimedir() }}", path = "/lib" },
+{% endraw %}
+    { uri = "file:/usr/lib/x86_64-linux-gnu", path = "/usr/lib/x86_64-linux-gnu" },
+    { uri = "file:/etc", path = "/etc" },
+    { type = "tmpfs", path = "/tmp" },
+    { uri = "file:/app", path = "/app" },
+    { uri = "file:/root", path = "/root" },
+    { uri = "file:{{ dotnet }}", path = "{{ dotnet }}" },
+]
+
+sgx.enclave_size = "2G" # seems to be minimum feasible
+sgx.max_threads = 32
+sgx.debug = {{ "false" if build_config == "Release" else "true" }}
+sgx.remote_attestation = "dcap"
+
+# used by the .NET runtime, disabling it doesn't seem to break things but is slower
+sys.experimental__enable_flock = true
+
+sgx.trusted_files = [
+    "file:/app/",
+    "file:{{ dotnet }}/",
+{% raw -%}
+    "file:{{ gramine.libos }}",
+    "file:{{ gramine.runtimedir() }}/",
+
+    # TODO: only list libraries used by the project to reduce footprint and startup time
+    "file:/usr/lib/x86_64-linux-gnu/",
+
+    "file:/etc/localtime",
+
+    # TODO: these are only needed for network access
+    "file:/etc/hosts",
+    "file:/etc/host.conf",
+    "file:/etc/nsswitch.conf",
+    "file:/etc/resolv.conf",
+    "file:/etc/passwd",
+    "file:/etc/ssl/",
+]
+
+sgx.allowed_files = [
+    "file:/root/",
+]
+
+# TODO: customize
+sgx.isvprodid = 1
+sgx.isvsvn    = 1
+{% endraw %}
