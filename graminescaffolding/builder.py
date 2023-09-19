@@ -2,6 +2,7 @@
 # Copyright (C) 2023 Intel Corporation
 #                    Wojtek Porczyk <woju@invisiblethingslab.com>
 #                    Mariusz Zaborski <oshogbo@invisiblethingslab.com>
+#                    Rafał Wojdyła <omeg@invisiblethingslab.com>
 
 import os
 import pathlib
@@ -401,5 +402,44 @@ class JavaGradleBuilder(Builder):
                 },
             })
         return click_parser
+
+
+class DotnetBuilder(Builder):
+    framework = 'dotnet'
+    depends = (
+        'dotnet-sdk-7.0',
+        'ca-certificates',
+    )
+    bootstrap_defaults = (
+        '--build_config=Release',
+        '--project_file=hello_world.csproj',
+        '--target=hello_world',
+    )
+
+    @classmethod
+    def cmdline_setup_parser(cls, project_dir):
+        @click.command()
+        @utils.gramine_option_prompt('--build_config', required=True,
+            type=click.Choice(['Debug', 'Release']),
+            help='Build configuration', prompt='Build configuration')
+        @utils.gramine_option_prompt('--project_file', required=True, type=str,
+            help='Application\'s main project file',
+            prompt='Application\'s main project file')
+        @utils.gramine_option_prompt('--target', required=True, type=str,
+            help='Application binary (found in bin/{Debug|Release}/net7.0)',
+            prompt='Application binary (found in bin/{Debug|Release}/net7.0)')
+        def click_parser(build_config, project_file, target):
+            return cls(project_dir, {
+                'application': {
+                    'framework': cls.framework,
+                },
+                cls.framework: {
+                    'build_config': build_config,
+                    'project_file': project_file,
+                    'target': target,
+                },
+            })
+        return click_parser
+
 
 # vim: tw=80
