@@ -32,7 +32,7 @@ fs.mounts = [
 
 sgx.enclave_size = "2G" # seems to be minimum feasible
 sgx.max_threads = 32
-sgx.debug = true # TODO: disable for release
+sgx.debug = {{ "false" if build_config == "Release" else "true" }}
 sgx.remote_attestation = "dcap"
 
 # used by the .NET runtime, disabling it doesn't seem to break things but is slower
