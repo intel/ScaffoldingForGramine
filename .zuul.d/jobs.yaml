@@ -39,7 +39,7 @@
 - job:
     name: scaffolding-test
     nodeset: any
-    run: .zuul.d/playbooks/scaffolding-test/run.yaml
+    run: .zuul.d/playbooks/scaffolding-tests/run.yaml
     abstract: true
 
 - job:
