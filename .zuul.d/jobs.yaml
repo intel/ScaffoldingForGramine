@@ -37,28 +37,28 @@
     attempts: 1
 
 - job:
-    name: scaffolding-test
+    name: scaffolding-tests
     nodeset: any
-    run: .zuul.d/playbooks/scaffolding-test/run.yaml
+    run: .zuul.d/playbooks/scaffolding-tests/run.yaml
     abstract: true
 
 - job:
     name: test-python
-    parent: scaffolding-test
+    parent: scaffolding-tests
     vars:
       test: python
 
 - job:
     name: test-flask
-    parent: scaffolding-test
+    parent: scaffolding-tests
     vars:
       test: flask
 
 - job:
     name: test-nodejs
-    parent: scaffolding-test
+    parent: scaffolding-tests
     vars:
-      test: node
+      test: nodejs
 
 - project:
     name: intel/ScaffoldingForGramine
