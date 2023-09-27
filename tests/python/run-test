@@ -24,7 +24,10 @@ expect {
     eof { exit 1 }
 }
 
-spawn docker run -it --rm --device /dev/sgx_enclave "$image"
+spawn docker run -it --rm \
+    --device /dev/sgx_enclave \
+    --volume /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+    "$image"
 
 expect {
     "hello, world" { exit 0 }
