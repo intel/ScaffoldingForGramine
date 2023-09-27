@@ -17,6 +17,9 @@ WORKDIR /app
 COPY . /app
 {% endblock %}
 
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 {# dockerfile_generate_manifest -#}
 
 # hadolint ignore=DL3059
