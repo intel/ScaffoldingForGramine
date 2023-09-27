@@ -1,7 +1,8 @@
 {% extends 'Dockerfile' %}
 
 {% block install %}
-RUN apt-get install --no-install-recommends -y python3.8 uwsgi nginx uwsgi-plugin-python3 python3-flask
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y python3.8 uwsgi nginx uwsgi-plugin-python3 python3-flask
 {% endblock %}
 
 {% block copy_app %}
