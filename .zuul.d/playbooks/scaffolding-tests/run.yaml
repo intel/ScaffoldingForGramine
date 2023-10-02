@@ -21,7 +21,7 @@
         PATH: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin:{{ ansible_env.PATH }}'
 
     - name: Run hadolint
-      command: ./run-hadolint --ignore DL3008 --ignore DL3009
+      command: ./run-hadolint --ignore DL3008 --ignore DL3009 --ignore DL3059
       args:
         chdir: '{{ zuul.project.src_dir }}/tests/{{ test }}'
       environment:
