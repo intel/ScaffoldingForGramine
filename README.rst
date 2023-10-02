@@ -14,6 +14,7 @@ Debian 12, Ubuntu 23.04
     sudo apt-get build-dep .
     debuild
     sudo apt-get install ../gramine-scaffolding_*.deb
+    # gramine-sgx-gen-private-key # if you didn't already
     scag-quickstart
 
 Debian 11
@@ -25,6 +26,7 @@ Debian 11
     sudo apt-get build-dep . -t bullseye-backports
     debuild
     sudo apt-get install ../gramine-scaffolding_*.deb
+    # gramine-sgx-gen-private-key # if you didn't already
     scag-quickstart
 
 Install into venv (for other distros, esp. for Ubuntu older than 23.04)
@@ -39,7 +41,13 @@ environment. Those work only for single user, and either:
 - add venv's ``bin/`` directory to ``$PATH`` environment variable.
 
 First, install gramine as described in
-https://gramine.rtfd.io/en/stable/installation.html#install-gramine-packages
+https://gramine.rtfd.io/en/stable/installation.html#install-gramine-packages .
+If you haven't generated an SGX signing key, you may want to consider executing
+the following command
+
+.. code-block:: sh
+
+    gramine-sgx-gen-private-key
 
 Then:
 
