@@ -9,6 +9,7 @@ _man_pages_author = 'Wojtek Porczyk'
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
 ]
 
@@ -24,3 +25,7 @@ man_pages = [
     ('manpages/scag-quickstart', 'scag-quickstart', 'Build Gramine Scaffolding application', _man_pages_author, 1),
     ('manpages/scag-setup', 'scag-setup', 'Build Gramine Scaffolding application', _man_pages_author, 1),
 ]
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+}
