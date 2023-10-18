@@ -7,17 +7,20 @@ Welcome to Gramine Scaffolding's documentation!
 ===============================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
+
+    configuration
+    hacking
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Manpages:
-
-   manpages/scag-quickstart
-   manpages/scag-setup
-   manpages/scag-build
-   manpages/scag-detect
+    :maxdepth: 1
+    :caption: Manpages:
+    
+    manpages/scag-quickstart
+    manpages/scag-setup
+    manpages/scag-build
+    manpages/scag-detect
 
 Indices and tables
 ==================

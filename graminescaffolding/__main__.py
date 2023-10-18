@@ -5,6 +5,7 @@
 # pylint: disable=too-many-arguments
 
 import os
+import pathlib
 import subprocess
 import sys
 import textwrap
@@ -12,9 +13,17 @@ import tomli
 
 import click
 
-from .frameworks.common.builder import GramineBuilder
-from .utils import (GramineExtendedSetupHelp, gramine_enable_prompts, gramine_list_frameworks,
-    gramine_load_framework, gramine_option_numerical_prompt, gramine_option_prompt)
+#from .frameworks.common.builder import GramineBuilder
+from . import builder as _builder
+from . import utils
+from .utils import (
+    GramineExtendedSetupHelp,
+    gramine_enable_prompts,
+    gramine_list_frameworks,
+    gramine_load_framework,
+    gramine_option_numerical_prompt,
+    gramine_option_prompt,
+)
 
 def detect(quiet=False):
     """
@@ -38,18 +47,6 @@ def detect(quiet=False):
 
     return True
 
-def get_default_sgx_key():
-    """
-    Get default SGX key path.
-
-    Returns:
-        str: path to default SGX key
-    """
-    return os.path.join(
-        os.path.expanduser('~'),
-        ".config/gramine/enclave-key.pem",
-    )
-
 @click.group()
 def main():
     """
@@ -64,10 +61,23 @@ def _detect(quiet):
     """
     sys.exit(not detect(quiet=quiet))
 
-def print_docker_usage(docker_id, builder):
+def get_docker_run_command(docker_id, *extra_opts):
+    return [
+        'docker', 'run',
+        '--device', '/dev/sgx_enclave',
+        '--volume', '/var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket',
+        *extra_opts,
+        docker_id
+    ]
+
+def run_docker(docker_id, *args):
+    # pylint: disable=subprocess-run-check
+    subprocess.run(get_docker_run_command(docker_id, *args))
+
+def print_docker_usage(docker_id):
     print(f'Your new docker image {docker_id}')
     print('You can run it using command:')
-    print(' '.join(builder.get_toolchain().get_run_command(docker_id)))
+    print(' '.join(get_docker_run_command(docker_id)))
 
 @main.command('quickstart', context_settings={'ignore_unknown_options': True})
 def quickstart():
@@ -78,14 +88,13 @@ def quickstart():
     project_dir = gramine_enable_prompts(setup)(standalone_mode=False)
     if not click.confirm('Do you want to build it now?'):
         return
-    docker_id, builder = build_step(project_dir, GramineBuilder.SCAG_CONFIG_FILE,
-        get_default_sgx_key())
+    docker_id = build_step(project_dir, _builder.SCAG_CONFIG_FILE)
     if not docker_id:
         return
-    print_docker_usage(docker_id, builder)
+    print_docker_usage(docker_id)
     if not click.confirm('Do you want to run it now?'):
         return
-    builder.get_toolchain().run_docker(docker_id)
+    run_docker(docker_id)
 
 def setup_handle_project_dir(ctx, project_dir, bootstrap):
     def prompt_version(project_dir):
@@ -130,20 +139,14 @@ def setup_handle_project_dir(ctx, project_dir, bootstrap):
     type=click.Choice(gramine_list_frameworks()),
     prompt='Which framework you want to use?',
     help='The framework used by the scaffolded application.')
-@gramine_option_prompt('--sgx',
-    default=False, type=bool, prompt='Do you want to use SGX?',
-    help='Scaffold application using Intel Software Guard Extensions (Intel'
-    ' SGX).')
-@gramine_option_prompt('--sgx_key', default='', type=str,
-    help='Path to the private key used for signing.')
 @gramine_option_prompt('--project_dir', required=True, type=str,
     default=os.getcwd(), prompt='Your\'s app directory is',
     help='The directory of the application to scaffold.')
 @gramine_option_prompt('--bootstrap', required=False, is_flag=True,
     default=False, help='Bootstrap directory with framework example.')
-@click.argument('setup_args', nargs=-1, type=click.UNPROCESSED)
+@click.argument('args', nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
-def setup(ctx, framework, sgx, sgx_key, project_dir, bootstrap, setup_args):
+def setup(ctx, framework, project_dir, bootstrap, args):
     """
     Build Gramine application using Scaffolding framework.
 
@@ -155,66 +158,67 @@ def setup(ctx, framework, sgx, sgx_key, project_dir, bootstrap, setup_args):
     try:
         bootstrap = setup_handle_project_dir(ctx, project_dir, bootstrap)
     except ValueError as err:
-        print(f'Error: {err}')
-        sys.exit(1)
+        ctx.fail(f'{err}')
 
-    framework = gramine_load_framework(framework)().cmdline_setup(
-        getattr(ctx.command, 'prompts_enabled', False), bootstrap,
-        project_dir, sgx, sgx_key, args=setup_args, standalone_mode=False,
-    )
+    framework = gramine_load_framework(framework)
+    parser = framework.cmdline_setup_parser(project_dir)
     if bootstrap:
-        framework.bootstrap_framework()
-    framework.generate_config()
+        args = framework.bootstrap_defaults
+    if getattr(ctx.command, 'prompts_enabled', False):
+        parser = utils.gramine_enable_prompts(parser)
+    builder = parser(args=args, standalone_mode=False)
+
+    if bootstrap:
+        builder.create_example()
+    builder.create_config()
+
     return project_dir
 
 @main.command('build')
-@click.option('--conf', default=GramineBuilder.SCAG_CONFIG_FILE,
-    required=False, type=str,
-    help='The filename of the scaffolding configuration file. This file is'
-    ' most likely generated by scag-setup.')
-@click.option('--sgx_key', default=get_default_sgx_key(), type=str,
-    help='Path to the private key used for signing.')
-@click.option('--project_dir', required=True, type=str, default=os.getcwd(),
+@click.option('--conf', default=_builder.SCAG_CONFIG_FILE,
+    type=str, # XXX not click.File, this is relative to --project-dir
+    help='The filename of the scaffolding configuration file relative to'
+        ' --project_dir. This file is most likely generated by scag-setup.')
+@click.option('--project_dir', type=click.Path(dir_okay=True, file_okay=False),
+    required=True,
+    default=os.getcwd(),
     help='The directory of the application to scaffold.')
 @click.option('--print-only-image', is_flag=True,
     help='Print only the SHA of the produced docker image, without any'
-    ' additional decorators.')
+        ' additional decorators.')
 @click.option('--and-run', is_flag=True,
     help='Automatically run the application after build')
-def build(project_dir, conf, sgx_key, print_only_image, and_run):
+@click.pass_context
+def build(ctx, project_dir, conf, print_only_image, and_run):
     """
     Build Gramine application using Scaffolding framework.
     """
-    docker_id, builder = build_step(project_dir, conf, sgx_key)
+    docker_id = build_step(ctx, project_dir, conf)
     if docker_id:
         if print_only_image:
             print(docker_id)
         else:
-            print_docker_usage(docker_id, builder)
+            print_docker_usage(docker_id)
 
     if and_run:
-        builder.get_toolchain().run_docker(docker_id)
+        run_docker(docker_id)
 
-def build_step(project_dir, filename, sgx_key):
+def build_step(ctx, project_dir, conf):
     """
     Real steps for build Gramine application using Scaffolding framework.
     """
-    if not os.path.isdir(project_dir):
-        print(f'Project dir ({project_dir}) is not a directory')
-        sys.exit(1)
+    project_dir = pathlib.Path(project_dir)
+    confpath = project_dir / conf
+    if not confpath.is_file():
+        ctx.fail(f'Configuration file {confpath!r} not found or not a file')
 
-    conffile = os.path.join(project_dir, filename)
-    if not os.path.isfile(conffile):
-        print('Couldn\'t find a configuration file')
-        sys.exit(1)
+    with open(confpath, 'rb') as file:
+        data = tomli.load(file)
 
-    data = None
-    with open(conffile, encoding='utf8') as f_conffile:
-        data = tomli.loads(f_conffile.read())
+    buildertype = gramine_load_framework(data['application']['framework'])
+    builder = buildertype(project_dir, data)
 
-    builder = gramine_load_framework(data['application']['framework'])().toml_setup(
-        project_dir, sgx_key, data)
-    return builder.build(), builder
+    return builder.build()
 
 if __name__ == '__main__':
     main()
