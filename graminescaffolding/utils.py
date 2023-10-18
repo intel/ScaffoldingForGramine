@@ -3,12 +3,26 @@
 #                    Wojtek Porczyk <woju@invisiblethingslab.com>
 #                    Mariusz Zaborski <oshogbo@invisiblethingslab.com>
 
+import pathlib
+import shlex
 import sys
+import os
 
 import click
 import jinja2
 
-templates = jinja2.Environment(loader=jinja2.PackageLoader(__package__))
+templates = jinja2.Environment(
+    loader=jinja2.PackageLoader(__package__),
+    undefined=jinja2.StrictUndefined,
+    keep_trailing_newline=True,
+)
+templates.globals['scag'] = {
+    'keys_path': pathlib.Path(__file__).parent / 'keys',
+}
+templates.filters['shquote'] = shlex.quote
+
+def filter_shquote(s):
+    return shlex.quote(os.fspath(s))
 
 FRAMEWORK_ENTRY_POINTS_GROUP = 'gramine.scaffolding.framework'
 
