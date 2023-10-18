@@ -3,8 +3,7 @@
 spawn scag-setup \
     --framework nodejs_plain \
     --project_dir app \
-    --bootstrap \
-    --sgx 1
+    --bootstrap
 
 lassign [wait] pid spawnid os_error_flag value
 

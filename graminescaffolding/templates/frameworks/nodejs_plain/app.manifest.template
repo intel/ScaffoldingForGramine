@@ -1,22 +1,24 @@
 {% raw -%}
-{% set python3 = '/usr/bin/python3.8' -%}
+{% set nodejs = '/usr/bin/node' -%}
+{% endraw %}
+
+loader.argv = ["{{'{{'}} nodejs }}", "/app/{{ application }}"]
+
+{% raw -%}
 loader.entrypoint = "file:{{ gramine.libos }}"
-libos.entrypoint = "{{ python3 }}"
+libos.entrypoint = "{{ nodejs }}"
 
 loader.env.LD_LIBRARY_PATH = "/lib:/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu"
-loader.env.OMP_NUM_THREADS = "4"
-loader.argv = ["{{ python3 }}", "{{ application }}"]
 
-sys.enable_sigterm_injection = true
+{# Node.js requires eventfd2() emulation otherwise fails on `(uv_loop_init(&tracing_loop_)) == (0)' #}
+sys.insecure__allow_eventfd = true
 
 fs.mounts = [
   { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
   { path = "/lib/x86_64-linux-gnu", uri = "file:/lib/x86_64-linux-gnu" },
   { path = "/usr/lib/x86_64-linux-gnu", uri = "file:/usr/lib/x86_64-linux-gnu" },
-{% for path in python.get_sys_path(python3) %}
-  { path = "{{ path }}", uri = "file:{{ path }}" },
-{% endfor %}
-  { path = "{{ python3 }}", uri = "file:{{ python3 }}" },
+  { path = "/usr/share/nodejs", uri = "file:/usr/share/nodejs" },
+  { path = "{{ nodejs }}", uri = "file:{{ nodejs }}" },
   { path = "/app", uri = "file:/app" },
 
   { type = "tmpfs", path = "/tmp" },
@@ -36,13 +38,11 @@ sgx.trusted_files = [
   "file:{{ gramine.runtimedir() }}/",
   "file:/lib/x86_64-linux-gnu/",
   "file:/usr/lib/x86_64-linux-gnu/",
-  "file:{{ python3 }}",
-{% for path in python.get_sys_path(python3) %}
-  "file:{{ path }}{{ '/' if path.is_dir() else '' }}",
-{% endfor %}
+  "file:/usr/share/nodejs/",
+  "file:{{ nodejs }}",
   "file:/app/",
-{% block trusted_files %}
-{% endblock %}
+  {% block trusted_files %}
+  {% endblock %}
 ]
 {% endraw %}
 
