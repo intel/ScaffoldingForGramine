@@ -1,4 +1,5 @@
 {% raw -%}
+{% set python3 = '/usr/bin/python3.11' -%}
 loader.entrypoint = "file:{{ gramine.libos }}"
 loader.argv = ["sh", "-c",
 """
@@ -7,12 +8,14 @@ loader.argv = ["sh", "-c",
     --manage-script-name \
     --logto /dev/null \
     --chdir /app \
-    --plugin python38 \
+    --plugin python311 \
     --mount /=app:app \
     &
 /usr/bin/gramine-ratls /tmp/crt.pem /tmp/key.pem -- /usr/sbin/nginx -p /etc/nginx -c nginx.conf
 """
 ]
+
+sys.insecure__allow_eventfd = true
 
 libos.entrypoint = "/bin/sh"
 
@@ -31,7 +34,7 @@ fs.mounts = [
 
     { path = "/usr/bin/gramine-ratls", uri = "file:/usr/bin/gramine-ratls" },
 
-    { path = "/etc/nginx/nginx.conf", uri = "file:/confs/nginx.conf" },
+    { path = "/etc/nginx/nginx.conf", uri = "file:/app/.scag/nginx.conf" },
     { path = "/app", uri = "file:/app/" },
 
     { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
@@ -53,7 +56,6 @@ sgx.trusted_files = [
     "file:{{ gramine.runtimedir() }}/",
 
     "file:/app/",
-    "file:/confs/nginx.conf",
 
     "file:/usr/bin/gramine-ratls",
     "file:/bin/sh",
@@ -61,9 +63,11 @@ sgx.trusted_files = [
     "file:/usr/bin/uwsgi",
     "file:/usr/sbin/nginx",
 
-    "file:/usr/lib/python3.8/",
+    "file:/usr/lib/python3.11/",
     "file:/usr/lib/python3/",
 
+    "file:/usr/lib/x86_64-linux-gnu/",
+{#
     "file:/usr/lib/x86_64-linux-gnu/libcap.so.2",
     "file:/usr/lib/x86_64-linux-gnu/libcrypt.so.1",
     "file:/usr/lib/x86_64-linux-gnu/libcrypto.so.1.1",
@@ -83,11 +87,14 @@ sgx.trusted_files = [
     "file:/usr/lib/x86_64-linux-gnu/libz.so.1",
     "file:/usr/lib/x86_64-linux-gnu/libmpdec.so.2",
     "file:/usr/lib/x86_64-linux-gnu/libbz2.so.1.0",
+#}
 
-    "file:/usr/lib/uwsgi/plugins/python38_plugin.so",
-    "file:/usr/lib/x86_64-linux-gnu/libpython3.8.so.1.0",
+    "file:/usr/lib/uwsgi/plugins/python311_plugin.so",
+    "file:/usr/lib/x86_64-linux-gnu/libpython3.11.so.1.0",
 
 {% endraw %}
 {% block trusted_files %}
 {% endblock %}
 ]
+
+{#- vim: set ft=jinja :#}
