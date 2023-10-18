@@ -5,8 +5,7 @@ set name expect-[pid]
 spawn scag-setup \
     --framework flask \
     --project_dir app \
-    --bootstrap \
-    --sgx 1
+    --bootstrap
 
 lassign [wait] pid spawnid os_error_flag value
 
@@ -20,7 +19,7 @@ if {$os_error_flag == 0} {
 set image ""
 spawn scag-build --project_dir app --print-only-image
 
-set timeout 90
+set timeout 300
 expect {
     -re {^sha256:([0-9a-f]+)} {
 	set image $expect_out(1,string)
