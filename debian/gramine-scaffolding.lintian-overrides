@@ -1,0 +1,2 @@
+gramine-scaffolding: shell-script-fails-syntax-check [usr/lib/python3/dist-packages/graminescaffolding/templates/*]
+gramine-scaffolding: script-not-executable [usr/lib/python3/dist-packages/graminescaffolding/templates/*]
