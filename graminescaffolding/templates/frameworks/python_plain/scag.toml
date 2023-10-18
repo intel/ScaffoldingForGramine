@@ -1,6 +1,6 @@
-{% extends 'gramine.scaffolding.toml' %}
+{% extends 'scag.toml' %}
 
-{% block framework %}
+{% block framework -%}
 application = "{{ application }}"
 {% endblock %}
 
