@@ -15,18 +15,19 @@ dependencies = [
     "click",
     "tomli",
     "tomli-w",
+    "docker",
 ]
 
 [project.entry-points.console_scripts]
-scag-build = "graminescaffolding.__main__:build"
-scag-detect = "graminescaffolding.__main__:_detect"
-scag-setup = "graminescaffolding.__main__:setup"
-scag-quickstart = "graminescaffolding.__main__:quickstart"
+scag-build =        "graminescaffolding.__main__:build"
+scag-detect =       "graminescaffolding.__main__:_detect"
+scag-setup =        "graminescaffolding.__main__:setup"
+scag-quickstart =   "graminescaffolding.__main__:quickstart"
 
 [project.entry-points."gramine.scaffolding.framework"]
-python_plain = "graminescaffolding.frameworks.python_plain.builder:builder_python"
-flask = "graminescaffolding.frameworks.flask.builder:builder_flask"
-nodejs_plain = "graminescaffolding.frameworks.nodejs_plain.builder:builder_node"
+python_plain =  "graminescaffolding.builder:PythonBuilder"
+flask =         "graminescaffolding.builder:FlaskBuilder"
+nodejs_plain =  "graminescaffolding.builder:NodejsBuilder"
 
 [tool.setuptools.packages.find]
 where = ["."]
