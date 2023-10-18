@@ -10,6 +10,8 @@ Welcome to Gramine Scaffolding's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   hacking
+
 .. toctree::
    :maxdepth: 1
    :caption: Manpages:

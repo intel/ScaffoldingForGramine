@@ -15,6 +15,7 @@ Build-Depends: debhelper-compat (= 13),
 # needed for dh_auto_test's run of pytest
  python3-pytest,
  python3-click,
+ python3-docker,
  python3-tomli,
  python3-tomli-w,
 
@@ -27,6 +28,7 @@ Depends:
  gramine,
  python3,
  python3-click,
+ python3-docker,
  python3-jinja2,
  python3-tomli,
  python3-tomli-w,
