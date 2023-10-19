@@ -1,5 +1,5 @@
-gramine-scaffolding (0~a0) UNRELEASED; urgency=medium
+gramine-scaffolding (1.0~alpha1) unstable-bookworm; urgency=medium
 
-  *
+  * TBD
 
- -- Wojtek Porczyk <woju@invisiblethingslab.com>  Fri, 12 May 2023 00:00:00 +0200
+ -- Wojtek Porczyk <woju@invisiblethingslab.com>  Thu, 19 Oct 2023 08:00:00 +0200

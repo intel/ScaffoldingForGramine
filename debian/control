@@ -25,7 +25,7 @@ Description: framework for quick development of Gramine apps
  TBD
 Depends:
  docker.io,
- gramine,
+ gramine (>= 1.6~),
  python3,
  python3-click,
  python3-docker,
