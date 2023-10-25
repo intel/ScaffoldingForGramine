@@ -31,6 +31,7 @@ spawn docker run -it --rm \
     --name $name \
     --device /dev/sgx_enclave \
     --volume /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+    --publish 8000:8000 \
     "$image"
 
 for {set i 0} {$i < 20} {incr i} {
@@ -43,7 +44,9 @@ for {set i 0} {$i < 20} {incr i} {
 	}
 }
 
-spawn docker exec $name curl --insecure https://localhost:8000
+spawn scag-client -C app \
+    --allow-outdated-tcb-insecure \
+    https://localhost:8000
 
 expect {
     "hello, flask" { set ret 0 }

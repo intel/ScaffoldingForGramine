@@ -268,7 +268,6 @@ class PythonBuilder(Builder):
 class FlaskBuilder(Builder):
     framework = 'flask'
     depends = (
-        'curl',
         'nginx',
         'python3-flask',
         'python3.11',
