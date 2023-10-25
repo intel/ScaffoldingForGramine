@@ -11,6 +11,7 @@ Welcome to Gramine Scaffolding's documentation!
     :caption: Contents:
 
     configuration
+    deployment
     hacking
 
 .. toctree::
