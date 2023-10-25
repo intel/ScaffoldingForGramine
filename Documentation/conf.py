@@ -21,6 +21,7 @@ extensions += ['sphinx_rtd_theme']
 
 man_pages = [
     ('manpages/scag-build', 'scag-build', 'Build Gramine Scaffolding application', _man_pages_author, 1),
+    ('manpages/scag-client', 'scag-client', 'HTTPS client with attestation verifier', _man_pages_author, 1),
     ('manpages/scag-detect', 'scag-detect', 'Scaffolding autodetector', _man_pages_author, 1),
     ('manpages/scag-quickstart', 'scag-quickstart', 'Build Gramine Scaffolding application', _man_pages_author, 1),
     ('manpages/scag-setup', 'scag-setup', 'Build Gramine Scaffolding application', _man_pages_author, 1),
