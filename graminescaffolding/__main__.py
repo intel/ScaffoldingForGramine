@@ -4,6 +4,7 @@
 #                    Mariusz Zaborski <oshogbo@invisiblethingslab.com>
 # pylint: disable=too-many-arguments
 
+import functools
 import os
 import pathlib
 import subprocess
@@ -14,8 +15,11 @@ import tomli
 import click
 
 #from .frameworks.common.builder import GramineBuilder
-from . import builder as _builder
-from . import utils
+from . import (
+    builder as _builder,
+    client as _client,
+    utils,
+)
 from .utils import (
     GramineExtendedSetupHelp,
     gramine_enable_prompts,
@@ -220,7 +224,97 @@ def build_step(ctx, project_dir, conf):
 
     return builder.build()
 
+@main.command('client')
+@click.option('--project_dir', '-C', metavar='PATH',
+    type=click.Path(dir_okay=True, file_okay=False),
+    help='The directory of the scaffolded application. If given,'
+        ' scag-client.toml config file will be read from the .scag magic'
+        ' subdirectory.')
+@click.option('--config', '-f', 'config_file', metavar='FILE',
+    type=click.File('r'),
+    help='Path to scag-client.toml configuration file.')
+@click.option('--request', '-X', 'method', metavar='METHOD', default='GET',
+    help='use another request HTTP method (instead of GET, the default)')
+@click.option('--verify',
+    type=click.Choice(tuple(_client.VERIFY_CB), case_sensitive=False),
+    help='load RA-TLS library for this method')
+@click.option('--output', '-o', metavar='PATH', type=click.File('wb'), default='-',
+    help='output to a file (by default or on "-" writes to standard output)')
+@click.option('--mrenclave',
+    help='specify different mrenclave')
+@click.option('--mrsigner',
+    help='specify different mrenclave')
+@click.option('--allow-debug-enclave-insecure/--no-allow-debug-enclave-insecure',
+    help='allow debug enclave (INSECURE)')
+@click.option('--allow-outdated-tcb-insecure/--no-allow-outdated-tcb-insecure',
+    help='allow OUTDATED_TCB (INSECURE)')
+@click.argument('url')
+@click.pass_context
+def client(
+    ctx, project_dir, config_file, method, url, verify, output,
+    mrenclave,
+    mrsigner,
+    allow_debug_enclave_insecure,
+    allow_outdated_tcb_insecure,
+):
+    # pylint: disable=too-many-locals,too-many-branches
+    if config_file is None:
+        if project_dir is None:
+            xdg_config_home = pathlib.Path(os.getenv('XDG_CONFIG_HOME',
+                pathlib.Path.home() / '.config'))
+            cfg_path = xdg_config_home / 'gramine' / 'scag-client.toml'
+            if not cfg_path.is_file():
+                ctx.fail('scag-client.toml not found')
+            config_file = open(cfg_path, 'rb')
+
+        else:
+            cfg_path = pathlib.Path(project_dir) / '.scag' / 'scag-client.toml'
+            if not cfg_path.is_file():
+                ctx.fail('scag-client.toml not found')
+            config_file = open(cfg_path, 'rb')
+
+    with config_file:
+        config = tomli.load(config_file)
+
+    try:
+        verify = verify or config['scag-client']['attestation']
+    except LookupError:
+        ctx.fail('missing --verify option')
+
+    verify_cb_kwds = {key.replace('-', '_'): value
+        for key, value in {
+            **config.get('sgx', {}),
+            **config.get(verify, {}),
+        }.items()
+    }
+
+    if mrenclave is not None:
+        verify_cb_kwds['mrenclave'] = mrenclave
+    if mrsigner is not None:
+        verify_cb_kwds['mrsigner'] = mrenclave
+    if allow_debug_enclave_insecure is not None:
+        verify_cb_kwds['allow_debug_enclave_insecure'] = (
+            allow_debug_enclave_insecure)
+    if allow_outdated_tcb_insecure is not None:
+        verify_cb_kwds['allow_outdated_tcb_insecure'] = (
+            allow_outdated_tcb_insecure)
+
+    verify_cb = functools.partial(
+        _client.VERIFY_CB[verify.lower()],
+        **verify_cb_kwds)
+
+    try:
+        resp = _client.request(method, url, verify_cb=verify_cb)
+    except _client.AttestationError:
+        ctx.fail('attestation failed')
+    except TypeError:
+        ctx.fail('problem with arguments to the verify function')
+
+    for chunk in iter(functools.partial(resp.read, 4096), b''):
+        output.write(chunk)
+
+
 if __name__ == '__main__':
-    main()
+    main() # pylint: disable=no-value-for-parameter
 
 # vim: tw=80

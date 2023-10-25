@@ -23,6 +23,7 @@ scag-build =        "graminescaffolding.__main__:build"
 scag-detect =       "graminescaffolding.__main__:_detect"
 scag-setup =        "graminescaffolding.__main__:setup"
 scag-quickstart =   "graminescaffolding.__main__:quickstart"
+scag-client =       "graminescaffolding.__main__:client"
 
 [project.entry-points."gramine.scaffolding.framework"]
 python_plain =  "graminescaffolding.builder:PythonBuilder"
