@@ -34,6 +34,10 @@ Depends:
  python3-tomli-w,
  ${python3:Depends},
  ${misc:Depends},
+Recommends:
+ gramine-ratls-dcap,
+ gramine-ratls-epid,
+ gramine-ratls-maa,
 
 Package: gramine-scaffolding-doc
 Architecture: all
