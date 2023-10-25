@@ -1,3 +1,6 @@
+sgx.debug = {{ sgx.debug|default(false) and 'true' or 'false' }}
+sgx.remote_attestation = "{{ sgx.remote_attestation|default('dcap') }}"
+
 {% raw -%}
 {% set python3 = '/usr/bin/python3.11' -%}
 loader.entrypoint = "file:{{ gramine.libos }}"
@@ -47,9 +50,6 @@ fs.mounts = [
     { path = "/tmp/nginx/scgi", type = "tmpfs" },
     { path = "/tmp/nginx/uwsgi", type = "tmpfs" },
 ]
-
-sgx.remote_attestation = "dcap"
-sgx.debug = true
 
 sgx.trusted_files = [
     "file:{{ gramine.libos }}",
