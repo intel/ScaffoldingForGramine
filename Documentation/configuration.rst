@@ -29,6 +29,24 @@ General options
         [sgx]
         sign_args = ['--key', 'example.pem']
 
+``sgx.debug`` (bool, default false)
+    INSECURE. Build debug enclave. Debug enclaves do not give any security
+    guarantees and should fail attestation, but can be used for debugging
+    running application.
+
+    This option mirrors ``sgx.debug`` option in Gramine manifest.
+
+``sgx.remote_attestation`` (string)
+    Chooses remote attestation, or disables it. One of:
+
+    - ``dcap`` (the default)
+    - ``epid``
+    - ``none``
+
+    For MAA, leave the default of ``dcap``.
+
+    This option mirrors ``sgx.remote_attestation`` option in Gramine manifest.
+
 Options specific to ``flask`` framework
 ----------------------------------------------
 
