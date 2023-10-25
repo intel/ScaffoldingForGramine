@@ -1,0 +1,5 @@
+[scag-client]
+attestation = "dcap"
+
+[sgx]
+mrenclave = "{{ mrenclave }}"
