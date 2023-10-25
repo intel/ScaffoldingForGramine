@@ -5,6 +5,14 @@ exclude_dirs:
   - ./tests/
 
 skips:
+  # We use python >= 3.8
+  - B309
+
+  # This check says that the TLS context is "insecure", because it does not
+  # conform to WebPKI checking algorithm. In RA-TLS, we intentionally don't do
+  # certificate checks according to WebPKI. We check the certs with RA-TLS.
+  - B323
+
   # https://bandit.readthedocs.io/en/latest/blacklists/blacklist_imports.html#b404-import-subprocess 
   # We have duly considered possible security implications of importing
   # subprocess and concluded that there are in fact no implications in this
