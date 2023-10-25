@@ -110,12 +110,12 @@ class Builder:
             types.MappingProxyType({}))
 
 
-    def _render_template_to_path(self, template, path):
+    def _render_template_to_path(self, template, path, /, **kwds):
         path.parent.mkdir(parents=True, exist_ok=True)
         template = self.templates.get_or_select_template(template,
             globals=self.variables)
         with open(path, 'w', encoding='utf-8') as file:
-            file.write(template.render())
+            file.write(template.render(**kwds))
 
 
     def _copy_binary_template_to_path(self, template, path):
@@ -162,6 +162,7 @@ class Builder:
         #   customise the image using dockerfiles, not only hooks to mmdebstrap
         self.render_templates()
         self.create_chroot()
+        self.render_client_config()
         return self.build_docker_image()
 
 
@@ -178,6 +179,16 @@ class Builder:
             self._render_template_to_path(
                 [t.format(framework=self.framework) for t in template_names],
                 self.magic_dir / path)
+
+
+    def render_client_config(self):
+        with open(self.magic_dir / 'rootfs.tar', 'rb') as file:
+            mrenclave = extract_mrenclave(file).hex()
+
+        self._render_template_to_path(
+            'scag-client.toml',
+            self.magic_dir / 'scag-client.toml',
+            mrenclave=mrenclave)
 
 
     def create_chroot(self):
