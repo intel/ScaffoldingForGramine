@@ -1,3 +1,7 @@
 #!/bin/sh
 
-lintian --default-display-level --display-level ">=pedantic" --fail-on "error,warning"
+lintian \
+    --suppress-tags bad-distribution-in-changes-file \
+    --default-display-level \
+    --display-level ">=pedantic" \
+    --fail-on "error,warning"
