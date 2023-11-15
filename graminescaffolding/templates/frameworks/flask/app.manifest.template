@@ -24,6 +24,9 @@ libos.entrypoint = "/bin/sh"
 
 loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib/x86_64-linux-gnu"
 loader.env.PYTHONDONTWRITEBYTECODE = "1"
+{% for item in passthrough_env.split(':') if passthrough_env %}
+loader.env.{{ item }} = { passthrough = true }
+{% endfor %}
 
 loader.uid = 65534
 loader.gid = 65534
