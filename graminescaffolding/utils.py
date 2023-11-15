@@ -70,7 +70,7 @@ class GramineExtendedSetupHelpFormatter(click.HelpFormatter):
 
         for name in gramine_list_frameworks():
             parser = gramine_load_framework(name).cmdline_setup_parser(
-                None)
+                None, None)
             self.indent()
             opts = []
             for param in parser.params:
