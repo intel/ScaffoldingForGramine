@@ -8,6 +8,9 @@ libos.entrypoint = "{{ python3 }}"
 
 loader.env.LD_LIBRARY_PATH = "/lib:/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu"
 loader.env.OMP_NUM_THREADS = "4"
+{% for item in passthrough_env.split(':') if passthrough_env %}
+loader.env.{{ item }} = { passthrough = true }
+{% endfor %}
 loader.argv = ["{{ python3 }}", "/app/{{ application }}"]
 
 sys.enable_sigterm_injection = true
