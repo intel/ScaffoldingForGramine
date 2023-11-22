@@ -52,7 +52,7 @@ Node.js Options
 
 .. option:: --application
 
-    Python application main script.
+    Node.js application main script.
 
 Files
 =====
