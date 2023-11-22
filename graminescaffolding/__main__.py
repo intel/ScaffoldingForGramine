@@ -80,7 +80,8 @@ def print_docker_usage(docker_id):
     print(' '.join(get_docker_run_command(docker_id)))
 
 @main.command('quickstart', context_settings={'ignore_unknown_options': True})
-def quickstart():
+@click.pass_context
+def quickstart(ctx):
     """
     Quickstart Gramine application using Scaffolding framework.
     """
@@ -88,7 +89,7 @@ def quickstart():
     project_dir = gramine_enable_prompts(setup)(standalone_mode=False)
     if not click.confirm('Do you want to build it now?'):
         return
-    docker_id = build_step(project_dir, _builder.SCAG_CONFIG_FILE)
+    docker_id = build_step(ctx, project_dir, _builder.SCAG_CONFIG_FILE)
     if not docker_id:
         return
     print_docker_usage(docker_id)
