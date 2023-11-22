@@ -66,6 +66,12 @@
     vars:
       test: java_jar
 
+- job:
+    name: test-java-gradle
+    parent: scaffolding-tests
+    vars:
+      test: java_gradle
+
 - project:
     name: intel/ScaffoldingForGramine
     check:
@@ -79,6 +85,7 @@
         - test-flask
         - test-nodejs
         - test-java-jar
+        - test-java-gradle
 
 - nodeset:
     name: plain
