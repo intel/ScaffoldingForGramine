@@ -13,6 +13,9 @@ then
 fi
 {%- endblock %}
 
+{% block build -%}
+{%- endblock %}
+
 {% block manifest -%}
 chroot "$1" gramine-manifest \
     {% block manifest_args %}{% endblock %} \
