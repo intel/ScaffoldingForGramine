@@ -28,6 +28,7 @@ scag-quickstart =   "graminescaffolding.__main__:quickstart"
 python_plain =  "graminescaffolding.builder:PythonBuilder"
 flask =         "graminescaffolding.builder:FlaskBuilder"
 nodejs_plain =  "graminescaffolding.builder:NodejsBuilder"
+java_jar =      "graminescaffolding.builder:JavaJARBuilder"
 
 [tool.setuptools.packages.find]
 where = ["."]
