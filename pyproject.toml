@@ -29,6 +29,7 @@ python_plain =  "graminescaffolding.builder:PythonBuilder"
 flask =         "graminescaffolding.builder:FlaskBuilder"
 nodejs_plain =  "graminescaffolding.builder:NodejsBuilder"
 java_jar =      "graminescaffolding.builder:JavaJARBuilder"
+java_gradle =   "graminescaffolding.builder:JavaGradleBuilder"
 
 [tool.setuptools.packages.find]
 where = ["."]
