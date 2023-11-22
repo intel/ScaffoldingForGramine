@@ -9,6 +9,8 @@ import subprocess
 import tarfile
 import types
 
+from importlib.resources import read_binary
+
 import click
 import docker
 
@@ -83,6 +85,9 @@ class Builder:
     extra_files = types.MappingProxyType({})
     depends = ()
     bootstrap_defaults = ()
+    BINARY_EXT = (
+        '.jar',
+    )
 
     def __init__(self, project_dir, config):
 
@@ -113,6 +118,16 @@ class Builder:
             file.write(template.render())
 
 
+    def _copy_binary_template_to_path(self, template, path):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        package, resource = template.rsplit('/', 1)
+        package = package.replace('/', '.')
+
+        data = read_binary(f'{__package__}.{package}', resource)
+        with open(path, 'wb') as file:
+            file.write(data)
+
+
     def create_config(self):
         # TODO sanity check (parse the file or str in the middle)
         self._render_template_to_path((
@@ -128,8 +143,12 @@ class Builder:
         prefix = f'frameworks/{self.framework}/example/'
         for template in self.templates.list_templates(
                 filter_func=lambda name: name.startswith(prefix)):
-            self._render_template_to_path(template,
-                self.project_dir / template.removeprefix(prefix))
+            dest = self.project_dir / template.removeprefix(prefix)
+            if template.endswith(self.BINARY_EXT):
+                self._copy_binary_template_to_path(f'templates/{template}',
+                    dest)
+            else:
+                self._render_template_to_path(template, dest)
 
 
     def build(self):
@@ -265,6 +284,32 @@ class NodejsBuilder(Builder):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which script is the main one")
+        def click_parser(application):
+            return cls(project_dir, {
+                'application': {
+                    'framework': cls.framework,
+                },
+                cls.framework: {
+                    'application': application,
+                },
+            })
+        return click_parser
+
+
+class JavaJARBuilder(Builder):
+    framework = 'java_jar'
+    depends = (
+        'openjdk-17-jre-headless',
+    )
+    bootstrap_defaults = (
+        '--application=hello_world.jar',
+    )
+
+    @classmethod
+    def cmdline_setup_parser(cls, project_dir):
+        @click.command()
+        @utils.gramine_option_prompt('--application', required=True, type=str,
+            prompt="Which JAR is the main one")
         def click_parser(application):
             return cls(project_dir, {
                 'application': {
