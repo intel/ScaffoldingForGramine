@@ -35,6 +35,7 @@ Options
     - Plain Python
     - Flask
     - Node.js
+    - Java JAR files
 
 .. option:: --project_dir <dir>
 
@@ -53,6 +54,13 @@ Node.js Options
 .. option:: --application
 
     Python application main script.
+
+Java JAR files Options
+======================
+
+.. option:: --application
+
+    Java JAR application.
 
 Files
 =====
