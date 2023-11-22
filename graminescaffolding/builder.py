@@ -322,4 +322,31 @@ class JavaJARBuilder(Builder):
         return click_parser
 
 
+class JavaGradleBuilder(Builder):
+    framework = 'java_gradle'
+    depends = (
+        'gradle',
+        'openjdk-17-jdk',
+        'openjdk-17-jre-headless',
+    )
+    bootstrap_defaults = (
+        '--application=build/libs/hello_world.jar',
+    )
+
+    @classmethod
+    def cmdline_setup_parser(cls, project_dir):
+        @click.command()
+        @utils.gramine_option_prompt('--application', required=True, type=str,
+            prompt="Which JAR is the main one")
+        def click_parser(application):
+            return cls(project_dir, {
+                'application': {
+                    'framework': cls.framework,
+                },
+                cls.framework: {
+                    'application': application,
+                },
+            })
+        return click_parser
+
 # vim: tw=80
