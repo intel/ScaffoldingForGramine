@@ -198,14 +198,14 @@ class Builder:
         """
         subprocess.run([
             'mmdebstrap',
-            '--mode=fakeroot',
+            '--mode=unshare',
             '--include', get_gramine_dependency(),
             *(f'--include={dep}' for dep in self.depends),
 
             '--setup-hook',
-                f'{self.magic_dir / "mmdebstrap-hooks/setup.sh"} "$@"',
+                f'sh {self.magic_dir / "mmdebstrap-hooks/setup.sh"} "$@"',
             '--customize-hook',
-                f'{self.magic_dir / "mmdebstrap-hooks/customize.sh"} "$@"',
+                f'sh {self.magic_dir / "mmdebstrap-hooks/customize.sh"} "$@"',
 
             CODENAME,
             self.magic_dir / 'rootfs.tar',
