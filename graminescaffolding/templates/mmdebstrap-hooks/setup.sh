@@ -2,6 +2,6 @@
 
 set -e
 
-install -D -t "$1"/etc/apt/trusted.gpg.d/ {{ scag.keys_path | shquote }}/*
+{% block install_keys %}{% endblock %}
 
 {#- vim: set ft=jinja : #}
