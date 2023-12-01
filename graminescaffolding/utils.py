@@ -11,13 +11,15 @@ import os
 import click
 import jinja2
 
+KEYS_PATH = pathlib.Path(__file__).parent / 'keys'
+
 templates = jinja2.Environment(
     loader=jinja2.PackageLoader(__package__),
     undefined=jinja2.StrictUndefined,
     keep_trailing_newline=True,
 )
 templates.globals['scag'] = {
-    'keys_path': pathlib.Path(__file__).parent / 'keys',
+    'keys_path': KEYS_PATH,
 }
 
 def filter_shquote(s):

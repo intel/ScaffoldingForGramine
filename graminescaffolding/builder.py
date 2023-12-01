@@ -204,6 +204,7 @@ class Builder:
         subprocess.run([
             'mmdebstrap',
             '--mode=unshare',
+            '--keyring', utils.KEYS_PATH / 'trusted.gpg.d',
             '--include', get_gramine_dependency(),
             *(f'--include={dep}' for dep in self.depends),
 
