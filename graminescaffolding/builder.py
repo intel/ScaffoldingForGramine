@@ -7,6 +7,7 @@ import os
 import pathlib
 import subprocess
 import tarfile
+import tempfile
 import types
 
 import importlib.resources
@@ -63,7 +64,11 @@ def get_gramine_dependency():
     return proc.stdout.decode('ascii')
 
 
-def extract_mrenclave(file, sigstruct_path='./app/app.sig'):
+def _extract_mrenclave_from_file(file):
+    file.seek(960)
+    return file.read(32)
+
+def extract_mrenclave_from_tar(file, sigstruct_path='./app/app.sig'):
     with tarfile.open(fileobj=file) as tar:
         try:
             # this might be None if path is in archive but is not a regular file
@@ -75,8 +80,11 @@ def extract_mrenclave(file, sigstruct_path='./app/app.sig'):
                 f'SIGSTRUCT at {sigstruct_path!r} in the archive not found or '
                 f'not a file')
         with sig:
-            sig.seek(960)
-            return sig.read(32)
+            return _extract_mrenclave_from_file(sig)
+
+def extract_mrenclave_from_path(path):
+    with open(path, 'rb') as file:
+        return _extract_mrenclave_from_file(file)
 
 # TODO replace SIGSTRUCT, using sgx-sign plugins
 
@@ -90,9 +98,9 @@ class Builder:
     )
 
     def __init__(self, project_dir, config):
-
         self.project_dir = pathlib.Path(project_dir)
         self.magic_dir = self.project_dir / SCAG_MAGIC_DIR
+        self.rootfs_tar = self.magic_dir / 'rootfs.tar'
         if config['application']['framework'] != self.framework:
             raise ValueError(
                 f'expected framework {self.framework!r}, '
@@ -162,7 +170,8 @@ class Builder:
         #   customise the image using dockerfiles, not only hooks to mmdebstrap
         self.render_templates()
         self.create_chroot()
-        self.render_client_config()
+        mrenclave = self.sign_chroot()
+        self.render_client_config(mrenclave)
         return self.build_docker_image()
 
 
@@ -181,10 +190,7 @@ class Builder:
                 self.magic_dir / path)
 
 
-    def render_client_config(self):
-        with open(self.magic_dir / 'rootfs.tar', 'rb') as file:
-            mrenclave = extract_mrenclave(file).hex()
-
+    def render_client_config(self, mrenclave):
         self._render_template_to_path(
             'scag-client.toml',
             self.magic_dir / 'scag-client.toml',
@@ -197,19 +203,56 @@ class Builder:
         """
         subprocess.run([
             'mmdebstrap',
-            '--mode=fakeroot',
+            '--mode=unshare',
             '--include', get_gramine_dependency(),
             *(f'--include={dep}' for dep in self.depends),
 
             '--setup-hook',
-                f'{self.magic_dir / "mmdebstrap-hooks/setup.sh"} "$@"',
+                f'sh {self.magic_dir / "mmdebstrap-hooks/setup.sh"} "$@"',
             '--customize-hook',
-                f'{self.magic_dir / "mmdebstrap-hooks/customize.sh"} "$@"',
+                f'sh {self.magic_dir / "mmdebstrap-hooks/customize.sh"} "$@"',
 
             CODENAME,
-            self.magic_dir / 'rootfs.tar',
+            self.rootfs_tar,
             self.magic_dir / 'sources.list',
         ], check=True)
+
+
+    def sign_chroot(self):
+        with (
+            tempfile.TemporaryDirectory() as tmprootdir,
+            tempfile.TemporaryDirectory() as tmpsigdir,
+        ):
+            tmprootdir = pathlib.Path(tmprootdir)
+            tmpsigdir = pathlib.Path(tmpsigdir)
+
+            tmpmsgx = tmpsigdir / 'app.manifest.sgx'
+            tmpsig = tmpsigdir / 'app.sig'
+
+            with tarfile.open(self.rootfs_tar) as tar:
+                # Filter out special files, because those can't be mknod()ed
+                # if we're not root. We don't care, no-one should be
+                # measuring them.
+                # TODO after Python 12: use extractall(filter=)
+                members = tar.getmembers()
+                members = [ti for ti in members if not ti.isdev()]
+                tar.extractall(tmprootdir, members=members)
+
+            subprocess.run([
+                'gramine-sgx-sign',
+                '--date', '0000-00-00',
+                *self.config.get('sgx', {}).get('sign_args', []),
+                '--chroot', tmprootdir,
+                '--manifest', tmprootdir / 'app/app.manifest',
+                '--output', tmpmsgx,
+                '--sigfile', tmpsig,
+            ], check=True)
+
+            with tarfile.open(self.rootfs_tar, 'a') as tar:
+                for path in [tmpmsgx, tmpsig]:
+                    tar.add(path, arcname=f'app/{path.name}')
+
+            return extract_mrenclave_from_path(tmpsig).hex()
 
 
     def build_docker_image(self):
