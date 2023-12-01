@@ -83,7 +83,7 @@ Then:
 
 .. code-block:: sh
 
-    sudo apt-get install docker.io python3-pip
+    sudo apt-get install docker.io python3-pip mmdebstrap
     python3 -m venv .venv
     source .venv/bin/activate
     python3 -m pip install .
