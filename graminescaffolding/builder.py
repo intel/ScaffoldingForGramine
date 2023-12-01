@@ -8,6 +8,7 @@ import os
 import pathlib
 import subprocess
 import tarfile
+import tempfile
 import types
 
 import importlib.resources
@@ -91,9 +92,9 @@ class Builder:
     )
 
     def __init__(self, project_dir, config):
-
         self.project_dir = pathlib.Path(project_dir)
         self.magic_dir = self.project_dir / SCAG_MAGIC_DIR
+        self.rootfs_tar = self.magic_dir / 'rootfs.tar'
         if config['application']['framework'] != self.framework:
             raise ValueError(
                 f'expected framework {self.framework!r}, '
@@ -163,7 +164,8 @@ class Builder:
         #   customise the image using dockerfiles, not only hooks to mmdebstrap
         self.render_templates()
         self.create_chroot()
-        self.render_client_config()
+        mrenclave = self.sign_chroot()
+        self.render_client_config(mrenclave)
         return self.build_docker_image()
 
 
@@ -182,10 +184,7 @@ class Builder:
                 self.magic_dir / path)
 
 
-    def render_client_config(self):
-        with open(self.magic_dir / 'rootfs.tar', 'rb') as file:
-            mrenclave = extract_mrenclave(file).hex()
-
+    def render_client_config(self, mrenclave):
         self._render_template_to_path(
             'scag-client.toml',
             self.magic_dir / 'scag-client.toml',
@@ -208,9 +207,30 @@ class Builder:
                 f'sh {self.magic_dir / "mmdebstrap-hooks/customize.sh"} "$@"',
 
             CODENAME,
-            self.magic_dir / 'rootfs.tar',
+            self.rootfs_tar,
             self.magic_dir / 'sources.list',
         ], check=True)
+
+
+    def sign_chroot(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = pathlib.Path(tmpdir)
+            with tempfile.NamedTemporaryFile() as tmpsig:
+                with tarfile.open(self.rootfs_tar) as tar:
+                    tar.extractall(tmpdir)
+                subprocess.run([
+                    'gramine-sgx-sign',
+                    '--date', '0000-00-00',
+                    '--chroot', tmpdir,
+                    '--manifest', tmpdir / 'app/app.manifest',
+                    '--output', tmpsig.name,
+                ], check=True)
+
+                with tarfile.open(self.rootfs_tar, 'a') as tar:
+                    tar.add(tmpsig.name, arcname='app/app.manifest.sgx')
+
+                tmpsig.seek(960)
+                return tmpsig.read(32)
 
 
     def build_docker_image(self):
