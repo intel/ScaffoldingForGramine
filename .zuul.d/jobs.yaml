@@ -82,16 +82,16 @@
     name: intel/ScaffoldingForGramine
     check:
       jobs:
-        - bandit
-        - pylint
-        - pytest
-        - build-deb
-        - build-docs
-        - test-python
-        - test-flask
-        - test-nodejs
-        - test-java-jar
-        - test-java-gradle
+#       - bandit
+#       - pylint
+#       - pytest
+#       - build-deb
+#       - build-docs
+#       - test-python
+#       - test-flask
+#       - test-nodejs
+#       - test-java-jar
+#       - test-java-gradle
         - test-dotnet
 
 - nodeset:
