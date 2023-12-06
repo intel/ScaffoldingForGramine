@@ -364,7 +364,7 @@ class ExpressjsBuilder(Builder):
         '--expressjs_internal_port=3000',
     )
     extra_files = {
-        'nginx.conf': (
+        'etc/nginx.conf': (
             'frameworks/{framework}/nginx-expressjs.conf',
         ),
     }
@@ -401,7 +401,7 @@ class KoajsBuilder(Builder):
         '--koajs_internal_port=3000',
     )
     extra_files = {
-        'nginx.conf': (
+        'etc/nginx.conf': (
             'frameworks/{framework}/nginx-koajs.conf',
         ),
     }
