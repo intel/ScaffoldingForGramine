@@ -1,3 +1,6 @@
+sgx.debug = {{ sgx.debug|default(false) and 'true' or 'false' }}
+sgx.remote_attestation = "{{ sgx.remote_attestation|default('dcap') }}"
+
 {% raw -%}
 {% set nodejs = '/usr/bin/node' -%}
 loader.entrypoint = "file:{{ gramine.libos }}"
@@ -27,9 +30,10 @@ fs.mounts = [
 
   { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
   { path = "/usr/lib/", uri = "file:/usr/lib/" },
+  { path = "/usr/share/nodejs/", uri = "file:/usr/share/nodejs/"},
 
   { path = "/usr/bin/gramine-ratls", uri = "file:/usr/bin/gramine-ratls" },
-  { path = "/etc/nginx/nginx.conf", uri = "file:/app/.scag/nginx.conf" },
+  { path = "/etc/nginx/nginx.conf", uri = "file:/usr/local/etc/nginx.conf" },
   { path = "/app", uri = "file:/app" },
 
   { path = "/tmp", type = "tmpfs" },
@@ -45,8 +49,6 @@ fs.mounts = [
 sys.stack.size = "2M"
 sys.enable_extra_runtime_domain_names_conf = true
 
-sgx.debug = true
-sgx.remote_attestation = "dcap"
 sgx.nonpie_binary = true
 sgx.enclave_size = "1G"
 sgx.max_threads = 32
@@ -63,11 +65,13 @@ sgx.trusted_files = [
   "file:/usr/sbin/nginx",
   "file:/bin/uname",
   "file:{{ nodejs }}",
+  "file:/usr/local/etc/nginx.conf",
 
   "file:/lib/x86_64-linux-gnu/",
   "file:/usr/lib/x86_64-linux-gnu/",
 
   "file:/app/",
+  "file:/usr/share/nodejs/",
 
   {% block trusted_files %}
   {% endblock %}
