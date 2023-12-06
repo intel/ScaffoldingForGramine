@@ -29,7 +29,7 @@ fs.mounts = [
   { path = "/usr/lib/", uri = "file:/usr/lib/" },
 
   { path = "/usr/bin/gramine-ratls", uri = "file:/usr/bin/gramine-ratls" },
-  { path = "/etc/nginx/nginx.conf", uri = "file:/app/.scag/nginx.conf" },
+  { path = "/etc/nginx/nginx.conf", uri = "file:/usr/local/etc/nginx.conf" },
   { path = "/app", uri = "file:/app" },
 
   { path = "/tmp", type = "tmpfs" },
@@ -64,6 +64,7 @@ sgx.trusted_files = [
   "file:/usr/sbin/nginx",
   "file:/bin/uname",
   "file:{{ nodejs }}",
+  "file:/usr/local/etc/nginx.conf",
 
   "file:/lib/x86_64-linux-gnu/",
   "file:/usr/lib/x86_64-linux-gnu/",
