@@ -19,7 +19,7 @@ if {$os_error_flag == 0} {
 set image ""
 spawn scag-build --project_dir app --print-only-image
 
-set timeout 300
+set timeout 600
 expect {
     -re {sha256:([0-9a-f]+)} {
 	set image $expect_out(1,string)
@@ -34,7 +34,7 @@ spawn docker run -it --rm \
     --publish 8000:8000 \
     "$image"
 
-for {set i 0} {$i < 20} {incr i} {
+for {set i 0} {$i < 60} {incr i} {
 	sleep 2
 	spawn docker exec $name sh -c "ss -H -4 -tuln | awk '{ print \$5 }'"
 	expect {
