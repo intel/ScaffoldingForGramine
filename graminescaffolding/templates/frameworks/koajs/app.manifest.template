@@ -29,7 +29,7 @@ fs.mounts = [
   { path = "/usr/lib/", uri = "file:/usr/lib/" },
 
   { path = "/usr/bin/gramine-ratls", uri = "file:/usr/bin/gramine-ratls" },
-  { path = "/etc/nginx/nginx.conf", uri = "file:/app/.scag/nginx.conf" },
+  { path = "/etc/nginx/nginx.conf", uri = "file:/usr/local/etc/nginx.conf" },
   { path = "/app", uri = "file:/app" },
 
   { path = "/tmp", type = "tmpfs" },
@@ -45,7 +45,7 @@ fs.mounts = [
 sys.stack.size = "2M"
 sys.enable_extra_runtime_domain_names_conf = true
 
-sgx.debug = true
+sgx.debug = {{ sgx.debug|default(false) and 'true' or 'false' }}
 sgx.remote_attestation = "dcap"
 sgx.nonpie_binary = true
 sgx.enclave_size = "1G"
@@ -63,6 +63,7 @@ sgx.trusted_files = [
   "file:/usr/sbin/nginx",
   "file:/bin/uname",
   "file:{{ nodejs }}",
+  "file:/usr/local/etc/nginx.conf",
 
   "file:/lib/x86_64-linux-gnu/",
   "file:/usr/lib/x86_64-linux-gnu/",
