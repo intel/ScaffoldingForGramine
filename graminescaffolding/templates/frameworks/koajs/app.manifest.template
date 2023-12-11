@@ -1,0 +1,82 @@
+sgx.debug = {{ sgx.debug|default(false) and 'true' or 'false' }}
+sgx.remote_attestation = "{{ sgx.remote_attestation|default('dcap') }}"
+
+{% raw -%}
+{% set nodejs = '/usr/bin/node' -%}
+loader.entrypoint = "file:{{ gramine.libos }}"
+loader.argv = ["sh", "-c",
+"""
+cd /app; node {{ application }} &
+/usr/bin/gramine-ratls /tmp/crt.pem /tmp/key.pem -- /usr/sbin/nginx -p /etc/nginx -c nginx.conf
+"""
+]
+
+libos.entrypoint = "/bin/sh"
+
+loader.env.LD_LIBRARY_PATH = "/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu"
+loader.env.XDG_DATA_HOME = "/tmp/xdg_data"
+loader.env.XDG_CONFIG_HOME = "/tmp/xdg_config"
+loader.env.HOME = "/tmp/xdg_config"
+
+# Node.js requires eventfd2() emulation otherwise fails on `(uv_loop_init(&tracing_loop_)) == (0)'
+sys.insecure__allow_eventfd = true
+
+fs.mounts = [
+  { path = "/bin", uri = "file:/bin" },
+  { path = "/sbin", uri = "file:/sbin" },
+
+  { path = "/usr/bin/", uri = "file:/usr/bin/" },
+  { path = "/usr/sbin/", uri = "file:/usr/sbin/" },
+
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "/usr/lib/", uri = "file:/usr/lib/" },
+  { path = "/usr/share/nodejs/", uri = "file:/usr/share/nodejs/"},
+
+  { path = "/usr/bin/gramine-ratls", uri = "file:/usr/bin/gramine-ratls" },
+  { path = "/etc/nginx/nginx.conf", uri = "file:/usr/local/etc/nginx.conf" },
+  { path = "/app", uri = "file:/app" },
+
+  { path = "/tmp", type = "tmpfs" },
+  { path = "/tmp/xdg_data", type = "tmpfs" },
+  { path = "/tmp/xdg_config", type = "tmpfs" },
+  { path = "/tmp/nginx/body", type = "tmpfs" },
+  { path = "/tmp/nginx/fastcgi", type = "tmpfs" },
+  { path = "/tmp/nginx/proxy", type = "tmpfs" },
+  { path = "/tmp/nginx/scgi", type = "tmpfs" },
+  { path = "/tmp/nginx/uwsgi", type = "tmpfs" },
+]
+
+sys.stack.size = "2M"
+sys.enable_extra_runtime_domain_names_conf = true
+
+sgx.nonpie_binary = true
+sgx.enclave_size = "1G"
+sgx.max_threads = 32
+
+loader.uid = 65534
+loader.gid = 65534
+
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ gramine.runtimedir() }}/",
+
+  "file:/bin/sh",
+  "file:/usr/bin/gramine-ratls",
+  "file:/usr/sbin/nginx",
+  "file:/bin/uname",
+  "file:{{ nodejs }}",
+  "file:/usr/local/etc/nginx.conf",
+
+  "file:/lib/x86_64-linux-gnu/",
+  "file:/usr/lib/x86_64-linux-gnu/",
+
+  "file:/app/",
+  "file:/usr/share/nodejs/",
+  "file:/usr/lib/ssl/",
+
+  {% block trusted_files %}
+  {% endblock %}
+]
+{% endraw %}
+
+{#- vim: set ft=jinja : #}

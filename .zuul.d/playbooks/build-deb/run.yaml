@@ -2,7 +2,7 @@
 
   tasks:
     - name: Build deb package
-      command: debuild --no-lintian
+      command: debuild --no-lintian --no-sign
       args:
         chdir: '{{ zuul.project.src_dir }}'
 

@@ -1,0 +1,10 @@
+{% block application -%}
+[application]
+framework = "{{ scag.builder.framework }}"
+{%- endblock %}
+
+[{{ scag.builder.framework }}]
+{% block framework %}
+{%- endblock %}
+
+{#- vim: set ft=jinja : #}

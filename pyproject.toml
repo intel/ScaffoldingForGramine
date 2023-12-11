@@ -15,17 +15,25 @@ dependencies = [
     "click",
     "tomli",
     "tomli-w",
+    "docker",
 ]
 
 [project.entry-points.console_scripts]
-scag-build = "graminescaffolding.__main__:build"
-scag-detect = "graminescaffolding.__main__:_detect"
-scag-setup = "graminescaffolding.__main__:setup"
-scag-quickstart = "graminescaffolding.__main__:quickstart"
+scag-build =        "graminescaffolding.__main__:build"
+scag-detect =       "graminescaffolding.__main__:_detect"
+scag-setup =        "graminescaffolding.__main__:setup"
+scag-quickstart =   "graminescaffolding.__main__:quickstart"
+scag-client =       "graminescaffolding.__main__:client"
 
 [project.entry-points."gramine.scaffolding.framework"]
-python_plain = "graminescaffolding.frameworks.python_plain.builder:builder_python"
-flask = "graminescaffolding.frameworks.flask.builder:builder_flask"
+python_plain =  "graminescaffolding.builder:PythonBuilder"
+flask =         "graminescaffolding.builder:FlaskBuilder"
+nodejs_plain =  "graminescaffolding.builder:NodejsBuilder"
+expressjs =     "graminescaffolding.builder:ExpressjsBuilder"
+koajs =         "graminescaffolding.builder:KoajsBuilder"
+java_jar =      "graminescaffolding.builder:JavaJARBuilder"
+java_gradle =   "graminescaffolding.builder:JavaGradleBuilder"
+dotnet =        "graminescaffolding.builder:DotnetBuilder"
 
 [tool.setuptools.packages.find]
 where = ["."]

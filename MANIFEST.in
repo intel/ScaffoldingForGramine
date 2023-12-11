@@ -1,1 +1,2 @@
 recursive-include graminescaffolding/templates *
+recursive-include graminescaffolding/keys *

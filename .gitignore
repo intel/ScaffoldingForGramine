@@ -12,6 +12,3 @@
 /debian/files
 /debian/gramine-scaffolding*/
 /debian/tmp/
-
-/examples/*/app/.scag/
-/examples/*/app/scag.toml

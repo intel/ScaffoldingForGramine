@@ -1,0 +1,52 @@
+{% set jvm = '/usr/lib/jvm/java-17-openjdk-amd64' -%}
+
+{% raw -%}
+loader.entrypoint = "file:{{ gramine.libos }}"
+{% endraw -%}
+
+loader.argv = [
+    "java",
+    "-XX:CompressedClassSpaceSize=32m",
+    "-jar", "/app/{{ application }}",
+]
+
+libos.entrypoint = "{{ jvm }}/bin/java"
+
+loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib/x86_64-linux-gnu"
+
+loader.uid = 65534
+loader.gid = 65534
+
+fs.mounts = [
+{%- raw %}
+    { uri = "file:{{ gramine.runtimedir() }}", path = "/lib" },
+{%- endraw %}
+    { uri = "file:/usr/lib/x86_64-linux-gnu", path = "/usr/lib/x86_64-linux-gnu" },
+    { uri = "file:/etc/java-17-openjdk", path = "/etc/java-17-openjdk" },
+    { uri = "file:{{ jvm }}", path = "{{ jvm }}" },
+    { uri = "file:/app/build/libs/", path = "/app/build/libs" },
+    { uri = "file:/app/{{ application }}", path = "/app/{{ application }}" },
+]
+
+sgx.enclave_size = "4G"
+sgx.max_threads = 32
+sgx.remote_attestation = "{{ sgx.remote_attestation|default('dcap') }}"
+sgx.debug = {{ sgx.debug|default(false) and 'true' or 'false' }}
+
+sgx.trusted_files = [
+{%- raw %}
+    "file:{{ gramine.libos }}",
+    "file:{{ gramine.runtimedir() }}/",
+{%- endraw %}
+    "file:{{ jvm }}/",
+    "file:/app/{{ application }}",
+    "file:/app/build/libs/",
+    "file:/usr/lib/x86_64-linux-gnu/libz.so.1",
+    "file:/usr/lib/x86_64-linux-gnu/libstdc++.so.6",
+    "file:/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+
+{%- block trusted_files %}
+{%- endblock %}
+]
+
+{#- vim: set ft=jinja ts=4 sts=4 sw=4 et : #}

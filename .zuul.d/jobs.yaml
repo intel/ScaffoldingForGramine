@@ -37,25 +37,61 @@
     attempts: 1
 
 - job:
-    name: scaffolding-example
+    name: scaffolding-tests
     nodeset: any
-    run: .zuul.d/playbooks/scaffolding-example/run.yaml
+    run: .zuul.d/playbooks/scaffolding-tests/run.yaml
     abstract: true
 
 - job:
-    name: example-python
-    parent: scaffolding-example
+    name: test-python
+    parent: scaffolding-tests
     vars:
-      example: python
+      test: python
 
 - job:
-    name: example-flask
-    parent: scaffolding-example
+    name: test-flask
+    parent: scaffolding-tests
     vars:
-      example: flask
+      test: flask
+
+- job:
+    name: test-nodejs
+    parent: scaffolding-tests
+    vars:
+      test: nodejs
+
+- job:
+    name: test-koajs
+    parent: scaffolding-tests
+    vars:
+      test: koajs
+
+- job:
+    name: test-expressjs
+    parent: scaffolding-tests
+    vars:
+      test: expressjs
+
+- job:
+    name: test-java-jar
+    parent: scaffolding-tests
+    vars:
+      test: java_jar
+
+- job:
+    name: test-java-gradle
+    parent: scaffolding-tests
+    vars:
+      test: java_gradle
+
+- job:
+    name: test-dotnet
+    parent: scaffolding-tests
+    vars:
+      test: dotnet
 
 - project:
-    name: woju/gramine-scaffolding
+    name: intel/ScaffoldingForGramine
     check:
       jobs:
         - bandit
@@ -63,8 +99,14 @@
         - pytest
         - build-deb
         - build-docs
-        - example-python
-        - example-flask
+        - test-python
+        - test-flask
+        - test-nodejs
+        - test-expressjs
+        - test-koajs
+        - test-java-jar
+        - test-java-gradle
+        - test-dotnet
 
 - nodeset:
     name: plain

@@ -62,6 +62,7 @@ confidence=
 # --disable=W".
 disable=
     fixme,
+    raise-missing-from,
     missing-class-docstring,
     missing-function-docstring,
     missing-module-docstring,
@@ -259,6 +260,7 @@ function-naming-style=snake_case
 good-names=i,
            j,
            k,
+           s,
            ex,
            Run,
            _
