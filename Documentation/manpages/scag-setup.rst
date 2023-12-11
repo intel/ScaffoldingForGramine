@@ -45,6 +45,12 @@ Options
 
     The directory of the application to scaffold.
 
+.. option:: --passthrough_env
+
+    Pass specific environment variables from the Docker environment into
+    the Gramine process. The user can use this option multiple times to add
+    many environment variables.
+
 Python Options
 ==============
 
@@ -118,6 +124,9 @@ Example of the generated file:
     [application]
     framework = "python_plain"
     sgx = true
+
+    [gramine]
+    passthrough_env = []
 
     [python_plain]
     application = "hello_world.py"

@@ -117,7 +117,8 @@ class Builder:
         })
         self.templates.globals['sgx'] = self.config.get('sgx',
             types.MappingProxyType({}))
-
+        self.templates.globals['passthrough_env'] = list(
+            self.config['gramine'].get('passthrough_env', []))
 
     def _render_template_to_path(self, template, path, /, **kwds):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -271,12 +272,15 @@ class Builder:
 
 
     @classmethod
-    def cmdline_setup_parser(cls, project_dir):
+    def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         def click_parser():
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
+                },
+                'gramine': {
+                    'passthrough_env': passthrough_env,
                 },
             })
         return click_parser
@@ -292,7 +296,7 @@ class PythonBuilder(Builder):
     )
 
     @classmethod
-    def cmdline_setup_parser(cls, project_dir):
+    def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         @utils.gramine_option_prompt('--application', type=str,
             required=True,
@@ -302,6 +306,9 @@ class PythonBuilder(Builder):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
+                },
+                'gramine': {
+                    'passthrough_env': passthrough_env,
                 },
                 cls.framework: {
                     'application': application,
@@ -336,7 +343,7 @@ class NodejsBuilder(Builder):
     )
 
     @classmethod
-    def cmdline_setup_parser(cls, project_dir):
+    def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which script is the main one")
@@ -344,6 +351,9 @@ class NodejsBuilder(Builder):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
+                },
+                'gramine': {
+                    'passthrough_env': passthrough_env,
                 },
                 cls.framework: {
                     'application': application,
@@ -370,7 +380,7 @@ class ExpressjsBuilder(Builder):
     }
 
     @classmethod
-    def cmdline_setup_parser(cls, project_dir):
+    def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which script is the main one")
@@ -380,6 +390,9 @@ class ExpressjsBuilder(Builder):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
+                },
+                'gramine': {
+                    'passthrough_env': passthrough_env,
                 },
                 cls.framework: {
                     'application': application,
@@ -407,7 +420,7 @@ class KoajsBuilder(Builder):
     }
 
     @classmethod
-    def cmdline_setup_parser(cls, project_dir):
+    def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which script is the main one")
@@ -417,6 +430,9 @@ class KoajsBuilder(Builder):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
+                },
+                'gramine': {
+                    'passthrough_env': passthrough_env,
                 },
                 cls.framework: {
                     'application': application,
@@ -436,7 +452,7 @@ class JavaJARBuilder(Builder):
     )
 
     @classmethod
-    def cmdline_setup_parser(cls, project_dir):
+    def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which JAR is the main one")
@@ -444,6 +460,9 @@ class JavaJARBuilder(Builder):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
+                },
+                'gramine': {
+                    'passthrough_env': passthrough_env,
                 },
                 cls.framework: {
                     'application': application,
@@ -464,7 +483,7 @@ class JavaGradleBuilder(Builder):
     )
 
     @classmethod
-    def cmdline_setup_parser(cls, project_dir):
+    def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which JAR is the main one")
@@ -472,6 +491,9 @@ class JavaGradleBuilder(Builder):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
+                },
+                'gramine': {
+                    'passthrough_env': passthrough_env,
                 },
                 cls.framework: {
                     'application': application,
@@ -493,7 +515,7 @@ class DotnetBuilder(Builder):
     )
 
     @classmethod
-    def cmdline_setup_parser(cls, project_dir):
+    def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         @utils.gramine_option_prompt('--build_config', required=True,
             type=click.Choice(['Debug', 'Release']),
@@ -508,6 +530,9 @@ class DotnetBuilder(Builder):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
+                },
+                'gramine': {
+                    'passthrough_env': passthrough_env,
                 },
                 cls.framework: {
                     'build_config': build_config,

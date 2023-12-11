@@ -12,6 +12,9 @@ loader.entrypoint = "file:{{ gramine.libos }}"
 libos.entrypoint = "{{ nodejs }}"
 
 loader.env.LD_LIBRARY_PATH = "/lib:/lib:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu"
+{% for item in passthrough_env.split(':') if passthrough_env %}
+loader.env.{{ item }} = { passthrough = true }
+{% endfor %}
 
 {# Node.js requires eventfd2() emulation otherwise fails on `(uv_loop_init(&tracing_loop_)) == (0)' #}
 sys.insecure__allow_eventfd = true

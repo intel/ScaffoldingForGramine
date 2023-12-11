@@ -18,6 +18,7 @@ fi
 
 {% block manifest -%}
 chroot "$1" gramine-manifest \
+    -Dpassthrough_env={{ passthrough_env | join (':') }} \
     {% block manifest_args %}{% endblock %} \
     /app/app.manifest.template \
     /app/app.manifest

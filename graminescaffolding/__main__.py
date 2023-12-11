@@ -149,9 +149,11 @@ def setup_handle_project_dir(ctx, project_dir, bootstrap):
     help='The directory of the application to scaffold.')
 @gramine_option_prompt('--bootstrap', required=False, is_flag=True,
     default=False, help='Bootstrap directory with framework example.')
+@gramine_option_prompt('--passthrough_env', required=False, multiple=True,
+    help='List of passthrough environment variables.')
 @click.argument('args', nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
-def setup(ctx, framework, project_dir, bootstrap, args):
+def setup(ctx, framework, project_dir, bootstrap, passthrough_env, args):
     """
     Build Gramine application using Scaffolding framework.
 
@@ -166,7 +168,7 @@ def setup(ctx, framework, project_dir, bootstrap, args):
         ctx.fail(f'{err}')
 
     framework = gramine_load_framework(framework)
-    parser = framework.cmdline_setup_parser(project_dir)
+    parser = framework.cmdline_setup_parser(project_dir, passthrough_env)
     if bootstrap:
         args = framework.bootstrap_defaults
     if getattr(ctx.command, 'prompts_enabled', False):
