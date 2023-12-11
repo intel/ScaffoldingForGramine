@@ -71,8 +71,8 @@ class GramineExtendedSetupHelpFormatter(click.HelpFormatter):
         self.write_heading('\nFramework specific options')
 
         for name in gramine_list_frameworks():
-            parser = gramine_load_framework(name)().cmdline_setup_parser(
-                None, None, None)
+            parser = gramine_load_framework(name).cmdline_setup_parser(
+                None)
             self.indent()
             opts = []
             for param in parser.params:
