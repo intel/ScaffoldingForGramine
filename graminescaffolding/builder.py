@@ -6,6 +6,7 @@
 
 import os
 import pathlib
+import shlex
 import subprocess
 import tarfile
 import tempfile
@@ -15,9 +16,9 @@ import importlib.resources
 
 import click
 import docker
+import jinja2
 
 from . import (
-    templates,
     utils,
 )
 
@@ -51,6 +52,20 @@ WANT_FILES = types.MappingProxyType({
 
 # TODO allow custom, maybe from variables?
 CODENAME = 'bookworm'
+
+
+_templates = jinja2.Environment(
+    loader=jinja2.PackageLoader(__package__),
+    undefined=jinja2.StrictUndefined,
+    keep_trailing_newline=True,
+)
+_templates.globals['scag'] = {
+    'keys_path': utils.KEYS_PATH,
+}
+
+def filter_shquote(s):
+    return shlex.quote(os.fspath(s))
+_templates.filters['shquote'] = filter_shquote
 
 
 def get_gramine_dependency():
@@ -97,6 +112,7 @@ class Builder:
     BINARY_EXT = (
         '.jar',
     )
+    extra_templates_path = None
 
     def __init__(self, project_dir, config):
         self.project_dir = pathlib.Path(project_dir)
@@ -109,14 +125,30 @@ class Builder:
         self.config = config
         self.variables = self.config.get(self.framework,
             types.MappingProxyType({}))
-        self.templates = templates.overlay()
+        self.templates = self._init_jinja_env()
 
-        self.templates.globals['scag'] = templates.globals['scag'].copy()
-        self.templates.globals['scag'].update({
+
+    def _init_jinja_env(self):
+        loaders = [jinja2.PrefixLoader({'': _templates.loader}, '!')]
+        conf_templates = self.config['application'].get('templates')
+        if conf_templates is not None:
+            loaders.append(jinja2.FileSystemLoader(
+                self.project_dir / conf_templates))
+        if self.extra_templates_path is not None:
+            loaders.append(jinja2.FileSystemLoader(
+                self.project_dir / self.extra_templates_path))
+        loaders.append(_templates.loader)
+
+        templates = _templates.overlay(loader=jinja2.ChoiceLoader(loaders))
+
+        templates.globals['scag'] = _templates.globals['scag'].copy()
+        templates.globals['scag'].update({
             'builder': self,
         })
-        self.templates.globals['sgx'] = self.config.get('sgx',
+        templates.globals['sgx'] = self.config.get('sgx',
             types.MappingProxyType({}))
+
+        return templates
 
 
     def _render_template_to_path(self, template, path, /, **kwds):
