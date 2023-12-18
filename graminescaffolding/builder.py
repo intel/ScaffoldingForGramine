@@ -4,6 +4,7 @@
 #                    Mariusz Zaborski <oshogbo@invisiblethingslab.com>
 #                    Rafał Wojdyła <omeg@invisiblethingslab.com>
 
+import json
 import os
 import pathlib
 import shlex
@@ -48,6 +49,10 @@ WANT_FILES = types.MappingProxyType({
     'Dockerfile': (
         'Dockerfile',
     ),
+
+    'Dockerfile-final': (
+        'Dockerfile-final',
+    ),
 })
 
 # TODO allow custom, maybe from variables?
@@ -83,6 +88,9 @@ def get_gramine_dependency():
 def _extract_mrenclave_from_file(file):
     file.seek(960)
     return file.read(32)
+
+def extract_mrenclave_from_bytes(sigstruct):
+    return sigstruct[960:960+32]
 
 def extract_mrenclave_from_tar(file, sigstruct_path='./app/app.sig'):
     with tarfile.open(fileobj=file) as tar:
@@ -126,6 +134,14 @@ class Builder:
         self.variables = self.config.get(self.framework,
             types.MappingProxyType({}))
         self.templates = self._init_jinja_env()
+
+        self._docker_client = None
+
+    @property
+    def docker(self):
+        if self._docker_client is None:
+            self._docker_client = docker.from_env()
+        return self._docker_client
 
 
     def _init_jinja_env(self):
@@ -200,14 +216,12 @@ class Builder:
         Runs complete build process
         """
         # TODO allow running only some steps
-        # TODO split create_chroot, so that between bootstrapping and
-        #   gramine-manifest there's branch into docker, so people could
-        #   customise the image using dockerfiles, not only hooks to mmdebstrap
         self.render_templates()
         self.create_chroot()
-        mrenclave = self.sign_chroot()
+        image_unsigned = self.build_docker_image()
+        image, mrenclave = self.sign_docker_image(image_unsigned)
         self.render_client_config(mrenclave)
-        return self.build_docker_image()
+        return image.id
 
 
     def render_templates(self):
@@ -254,54 +268,92 @@ class Builder:
         ], check=True)
 
 
-    def sign_chroot(self):
-        with (
-            tempfile.TemporaryDirectory() as tmprootdir,
-            tempfile.TemporaryDirectory() as tmpsigdir,
-        ):
-            tmprootdir = pathlib.Path(tmprootdir)
+    def sign_chroot(self, rootdir, manifest_path='app/app.manifest'):
+        """
+        Signs tarball of the system image. Manifest needs to be in
+        /app/app.manifest
+
+        Args:
+            file: file object of the tarball
+            manifest_path (str): path to manifest inside the tarball
+
+        Returns:
+            (bytes, bytes): Tuple of file contents ``(app.manifest.sgx,
+            app.sig)`` that need to be added into the final image. MRENCLAVE can
+            be extracted from the latter.
+        """
+        with tempfile.TemporaryDirectory() as tmpsigdir:
             tmpsigdir = pathlib.Path(tmpsigdir)
 
             tmpmsgx = tmpsigdir / 'app.manifest.sgx'
             tmpsig = tmpsigdir / 'app.sig'
 
-            with tarfile.open(self.rootfs_tar) as tar:
-                # Filter out special files, because those can't be mknod()ed
-                # if we're not root. We don't care, no-one should be
-                # measuring them.
-                # TODO after Python 12: use extractall(filter=)
-                members = tar.getmembers()
-                members = [ti for ti in members if not ti.isdev()]
-                tar.extractall(tmprootdir, members=members)
-
             subprocess.run([
                 'gramine-sgx-sign',
                 '--date', '0000-00-00',
                 *self.config.get('sgx', {}).get('sign_args', []),
-                '--chroot', tmprootdir,
-                '--manifest', tmprootdir / 'app/app.manifest',
+                '--chroot', rootdir,
+                '--manifest', rootdir / manifest_path,
                 '--output', tmpmsgx,
                 '--sigfile', tmpsig,
             ], check=True)
 
-            with tarfile.open(self.rootfs_tar, 'a') as tar:
-                for path in [tmpmsgx, tmpsig]:
-                    tar.add(path, arcname=f'app/{path.name}')
-
-            return extract_mrenclave_from_path(tmpsig).hex()
+            return (tmpmsgx.read_bytes(), tmpsig.read_bytes())
 
 
-    def build_docker_image(self):
+    def sign_docker_image(self, image):
+        with (
+            tempfile.TemporaryFile() as savefile,
+            tempfile.TemporaryDirectory() as tmprootdir,
+        ):
+            tmprootdir = pathlib.Path(tmprootdir)
+
+            for chunk in image.save():
+                savefile.write(chunk)
+            savefile.seek(0)
+
+            with tarfile.open(fileobj=savefile) as tar:
+                manifest = json.load(tar.extractfile('manifest.json'))
+
+                # assert we have only 1 image
+                m_image, = manifest
+
+                for layer_path in m_image['Layers']:
+                    with tarfile.open(
+                        fileobj=tar.extractfile(layer_path)
+                    ) as layer_tar:
+                        # Filter out special files, because those can't be
+                        # mknod()ed if we're not root. We don't care, no-one
+                        # should be measuring them.
+                        # TODO after Python 12: use extractall(filter=)
+                        members = layer_tar.getmembers()
+                        members = [ti for ti in members if not ti.isdev()]
+                        layer_tar.extractall(tmprootdir, members=members)
+
+                msgx, sig = self.sign_chroot(tmprootdir)
+
+        (self.magic_dir / 'app.manifest.sgx').write_bytes(msgx)
+        (self.magic_dir / 'app.sig').write_bytes(sig)
+        image2 = self.build_docker_image(
+            dockerfile='.scag/Dockerfile-final',
+            buildargs={'FROM': image.id})
+
+        mrenclave = extract_mrenclave_from_bytes(sig)
+        return image2, mrenclave
+
+
+    def build_docker_image(self, dockerfile='.scag/Dockerfile', **kwds):
         """
         Step: create docker image from chroot.tar
         """
-        client = docker.from_env()
-        image, _ = client.images.build(
+        kwds.setdefault('rm', True)
+
+        image, _ = self.docker.images.build(
             path=os.fspath(self.project_dir),
-            dockerfile='.scag/Dockerfile',
-            rm=True,
+            dockerfile=dockerfile,
+            **kwds,
         )
-        return image.id
+        return image
 
 
     @classmethod
