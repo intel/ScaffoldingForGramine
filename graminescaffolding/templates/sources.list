@@ -1,7 +1,7 @@
 {% block sources %}
 deb http://deb.debian.org/debian/ bookworm main
 deb http://security.debian.org/debian-security bookworm-security main
-deb https://packages.gramineproject.io/ unstable-bookworm main
+deb https://packages.gramineproject.io/ bookworm main
 deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main
 {% endblock %}
 

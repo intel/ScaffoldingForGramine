@@ -8,19 +8,16 @@ Quick start (build from source)
 Steps common to all distros
 ---------------------------
 
-In this 0.1 release, you need Gramine 1.6, which is yet unreleased at the time
-of this writing, so until Gramine 1.6 is released, you need to install Gramine
-1.6 from unstable repositories. To do this, please prefix distro codename with
-``unstable-`` when following installation instructions for Gramine. Codename is
-e.g., ``bookworm`` for Debian 12, but for Ubuntu this might be written as
-``$(lsb_release -sc)`` substitution in the manual.
+First, you need to install Gramine 1.6 from upstream repositories. In this
+example, codename is e.g., ``bookworm`` for Debian 12, but for Ubuntu this might
+be written as ``$(lsb_release -sc)`` substitution in the manual.
 
 For example, when installing on Debian 12, add repositories like this:
 
 .. code-block:: sh
 
     sudo curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ unstable-bookworm main" \
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ bookworm main" \
     | sudo tee /etc/apt/sources.list.d/gramine.list
 
     sudo curl -fsSLo /usr/share/keyrings/intel-sgx-deb.asc https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
