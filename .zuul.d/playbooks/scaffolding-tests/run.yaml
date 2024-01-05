@@ -14,9 +14,9 @@
         chdir: '{{ zuul.project.src_dir }}'
 
     - name: Run test
-      command: ./run-test
+      command: './run-pytest tests/{{ test }}'
       args:
-        chdir: '{{ zuul.project.src_dir }}/tests/{{ test }}'
+        chdir: '{{ zuul.project.src_dir }}'
       environment:
         PATH: '{{ ansible_user_dir }}/{{ zuul.project.src_dir }}/.venv/bin:{{ ansible_env.PATH }}'
 
