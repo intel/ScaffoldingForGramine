@@ -38,3 +38,8 @@ dotnet =        "graminescaffolding.builder:DotnetBuilder"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["graminescaffolding", "graminescaffolding.*"]
+
+[tool.pytest.ini_options]
+markers = [
+    'framework',
+]

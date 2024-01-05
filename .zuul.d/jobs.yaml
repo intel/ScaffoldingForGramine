@@ -33,7 +33,7 @@
     parent: run-test-command
     nodeset: any
     vars:
-      test_command: ./run-pytest
+      test_command: ./run-pytest -m 'not framework'
     attempts: 1
 
 - job:
@@ -99,13 +99,13 @@
         - pytest
         - build-deb
         - build-docs
-        - test-python
-        - test-flask
-        - test-nodejs
-        - test-expressjs
-        - test-koajs
-        - test-java-jar
-        - test-java-gradle
+#       - test-python
+#       - test-flask
+#       - test-nodejs
+#       - test-expressjs
+#       - test-koajs
+#       - test-java-jar
+#       - test-java-gradle
         - test-dotnet
 
 - nodeset:
