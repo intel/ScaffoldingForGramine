@@ -20,6 +20,11 @@ General options
     - ``flask``
     - ``nodejs_plain``
 
+``application.templates`` (string)
+    Path to directory with extra templates, relative to project directory. Any
+    files in this directory will take precedence over templates in SCAG's global
+    directory.
+
 ``sgx.sign_args`` (array)
     Extra arguments to :command:`gramine-sgx-sign` command. Can be used to
     specify alternative RSA key, or use plugins.

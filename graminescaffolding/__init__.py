@@ -3,5 +3,3 @@
 #                    Wojtek Porczyk <woju@invisiblethingslab.com>
 
 __version__ = '0a0'
-
-from .utils import templates

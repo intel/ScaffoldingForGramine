@@ -1,6 +1,8 @@
 {% block application -%}
 [application]
 framework = "{{ scag.builder.framework }}"
+# Uncomment this if you'd like to use custom templates
+#templates = 'templates/'
 {%- endblock %}
 
 [{{ scag.builder.framework }}]
