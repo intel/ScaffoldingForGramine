@@ -273,8 +273,12 @@ def client(
             ctx.fail('scag-client.toml not found')
         config_file = open(cfg_path, 'rb')
 
-    with config_file:
-        config = tomli.load(config_file)
+    try:
+        with config_file:
+            config = tomli.load(config_file)
+    except tomli.TOMLDecodeError:
+        print(cfg_path, cfg_path.read_bytes())
+        raise
 
     try:
         verify = verify or config['scag-client']['attestation']
