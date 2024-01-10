@@ -234,7 +234,7 @@ def build_step(ctx, project_dir, conf):
         ' scag-client.toml config file will be read from the .scag magic'
         ' subdirectory.')
 @click.option('--config', '-f', 'config_file', metavar='FILE',
-    type=click.File('r'),
+    type=click.File('rb'),
     help='Path to scag-client.toml configuration file.')
 @click.option('--request', '-X', 'method', metavar='METHOD', default='GET',
     help='Use another request HTTP method (instead of GET, the default)')
