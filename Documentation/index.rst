@@ -6,6 +6,7 @@
 
     configuration
     deployment
+    templates
     hacking
 
 .. toctree::
