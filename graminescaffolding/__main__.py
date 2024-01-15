@@ -70,6 +70,7 @@ def get_docker_run_command(docker_id, *extra_opts):
         'docker', 'run',
         '--device', '/dev/sgx_enclave',
         '--volume', '/var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket',
+        '--publish', '8080:8080',
         *extra_opts,
         docker_id
     ]
