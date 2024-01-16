@@ -117,6 +117,7 @@ class Builder:
     extra_files = types.MappingProxyType({})
     depends = ()
     bootstrap_defaults = ()
+    extra_run_args = ()
     BINARY_EXT = (
         '.jar',
     )
@@ -356,6 +357,16 @@ class Builder:
         return image
 
 
+    def get_docker_run_cmd(self, docker_id):
+        return [
+            'docker', 'run',
+            '--device', '/dev/sgx_enclave',
+            '--volume', '/var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket',
+            *self.extra_run_args,
+            docker_id,
+        ]
+
+
     @classmethod
     def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
@@ -416,6 +427,9 @@ class FlaskBuilder(Builder):
             'frameworks/{framework}/nginx-uwsgi.conf',
         ),
     }
+    extra_run_args = (
+        '--publish', '8080:8080',
+    )
 
 
 class NodejsBuilder(Builder):
@@ -425,6 +439,9 @@ class NodejsBuilder(Builder):
     )
     bootstrap_defaults = (
         '--application=app.js',
+    )
+    extra_run_args = (
+        '--publish', '8080:8080',
     )
 
     @classmethod
@@ -498,6 +515,9 @@ class KoajsBuilder(Builder):
             'frameworks/nginx/nginx.conf',
         ),
     }
+    extra_run_args = (
+        '--publish', '8080:8080',
+    )
 
     @classmethod
     def cmdline_setup_parser(cls, project_dir, passthrough_env):
@@ -526,6 +546,9 @@ class JavaJARBuilder(Builder):
     )
     bootstrap_defaults = (
         '--application=hello_world.jar',
+    )
+    extra_run_args = (
+        '--publish', '8080:8080',
     )
 
     @classmethod
@@ -558,6 +581,9 @@ class JavaGradleBuilder(Builder):
     bootstrap_defaults = (
         '--application=build/libs/hello_world.jar',
     )
+    extra_run_args = (
+        '--publish', '8080:8080',
+    )
 
     @classmethod
     def cmdline_setup_parser(cls, project_dir, passthrough_env):
@@ -589,6 +615,9 @@ class DotnetBuilder(Builder):
         '--build_config=Release',
         '--project_file=hello_world.csproj',
         '--target=hello_world',
+    )
+    extra_run_args = (
+        '--publish', '8080:8080',
     )
 
     @classmethod
