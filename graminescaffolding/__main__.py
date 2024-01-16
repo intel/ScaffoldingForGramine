@@ -51,6 +51,11 @@ def detect(quiet=False):
 
     return True
 
+def print_docker_usage(docker_id, docker_run_cmd):
+    print(f'Your new docker image {docker_id}')
+    print('You can run it using command:')
+    print(' '.join(docker_run_cmd))
+
 @click.group()
 def main():
     """
@@ -65,24 +70,6 @@ def _detect(quiet):
     """
     sys.exit(not detect(quiet=quiet))
 
-def get_docker_run_command(docker_id, *extra_opts):
-    return [
-        'docker', 'run',
-        '--device', '/dev/sgx_enclave',
-        '--volume', '/var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket',
-        *extra_opts,
-        docker_id
-    ]
-
-def run_docker(docker_id, *args):
-    # pylint: disable=subprocess-run-check
-    subprocess.run(get_docker_run_command(docker_id, *args))
-
-def print_docker_usage(docker_id):
-    print(f'Your new docker image {docker_id}')
-    print('You can run it using command:')
-    print(' '.join(get_docker_run_command(docker_id)))
-
 @main.command('quickstart', context_settings={'ignore_unknown_options': True})
 @click.pass_context
 def quickstart(ctx):
@@ -93,13 +80,14 @@ def quickstart(ctx):
     project_dir = gramine_enable_prompts(setup)(standalone_mode=False)
     if not click.confirm('Do you want to build it now?'):
         return
-    docker_id = build_step(ctx, project_dir, _builder.SCAG_CONFIG_FILE)
+    docker_id, docker_run_cmd = build_step(
+        ctx, project_dir, _builder.SCAG_CONFIG_FILE)
     if not docker_id:
         return
-    print_docker_usage(docker_id)
+    print_docker_usage(docker_id, docker_run_cmd)
     if not click.confirm('Do you want to run it now?'):
         return
-    run_docker(docker_id)
+    return subprocess.run(docker_run_cmd, check=False).returncode
 
 def setup_handle_project_dir(ctx, project_dir, bootstrap):
     def prompt_version(project_dir):
@@ -200,15 +188,15 @@ def build(ctx, project_dir, conf, print_only_image, and_run):
     """
     Build Gramine application using Scaffolding framework.
     """
-    docker_id = build_step(ctx, project_dir, conf)
+    docker_id, docker_run_cmd = build_step(ctx, project_dir, conf)
     if docker_id:
         if print_only_image:
             print(docker_id)
         else:
-            print_docker_usage(docker_id)
+            print_docker_usage(docker_id, docker_run_cmd)
 
     if and_run:
-        run_docker(docker_id)
+        return subprocess.run(docker_run_cmd, check=False).returncode
 
 def build_step(ctx, project_dir, conf):
     """
@@ -225,7 +213,9 @@ def build_step(ctx, project_dir, conf):
     buildertype = gramine_load_framework(data['application']['framework'])
     builder = buildertype(project_dir, data)
 
-    return builder.build()
+    docker_id = builder.build()
+
+    return docker_id, builder.get_docker_run_cmd(docker_id)
 
 @main.command('client')
 @click.option('--project_dir', '-C', metavar='PATH',
