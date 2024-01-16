@@ -74,14 +74,14 @@ def get_docker_run_command(docker_id, *extra_opts):
         docker_id
     ]
 
-def run_docker(docker_id, *args):
+def run_docker(docker_id, *extra_opts):
     # pylint: disable=subprocess-run-check
-    subprocess.run(get_docker_run_command(docker_id, *args))
+    subprocess.run(get_docker_run_command(docker_id, *extra_opts))
 
-def print_docker_usage(docker_id):
+def print_docker_usage(docker_id, *extra_opts):
     print(f'Your new docker image {docker_id}')
     print('You can run it using command:')
-    print(' '.join(get_docker_run_command(docker_id)))
+    print(' '.join(get_docker_run_command(docker_id, *extra_opts)))
 
 @main.command('quickstart', context_settings={'ignore_unknown_options': True})
 @click.pass_context
@@ -93,13 +93,13 @@ def quickstart(ctx):
     project_dir = gramine_enable_prompts(setup)(standalone_mode=False)
     if not click.confirm('Do you want to build it now?'):
         return
-    docker_id = build_step(ctx, project_dir, _builder.SCAG_CONFIG_FILE)
+    docker_id, run_args = build_step(ctx, project_dir, _builder.SCAG_CONFIG_FILE)
     if not docker_id:
         return
-    print_docker_usage(docker_id)
+    print_docker_usage(docker_id, *run_args)
     if not click.confirm('Do you want to run it now?'):
         return
-    run_docker(docker_id)
+    run_docker(docker_id, *run_args)
 
 def setup_handle_project_dir(ctx, project_dir, bootstrap):
     def prompt_version(project_dir):
@@ -200,15 +200,15 @@ def build(ctx, project_dir, conf, print_only_image, and_run):
     """
     Build Gramine application using Scaffolding framework.
     """
-    docker_id = build_step(ctx, project_dir, conf)
+    docker_id, run_args = build_step(ctx, project_dir, conf)
     if docker_id:
         if print_only_image:
             print(docker_id)
         else:
-            print_docker_usage(docker_id)
+            print_docker_usage(docker_id, *run_args)
 
     if and_run:
-        run_docker(docker_id)
+        run_docker(docker_id, *run_args)
 
 def build_step(ctx, project_dir, conf):
     """
@@ -225,7 +225,7 @@ def build_step(ctx, project_dir, conf):
     buildertype = gramine_load_framework(data['application']['framework'])
     builder = buildertype(project_dir, data)
 
-    return builder.build()
+    return builder.build(), builder.run_args()
 
 @main.command('client')
 @click.option('--project_dir', '-C', metavar='PATH',
