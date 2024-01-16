@@ -1,0 +1,235 @@
+# https://aquasecurity.github.io/trivy/v0.48/docs/configuration/filtering/#trivyignore
+
+# Unbounded memory allocation in Guava. Example apps do not parse user-provided
+# data at all.
+CVE-2018-10237
+
+# Junit local information disclosure. Not relevant in Gramine.
+CVE-2020-15250
+
+# Bug in .NET's GDI, not used in example app.
+CVE-2021-24112
+
+# Gradle build-time LPE. In SGX model, build host is considered trusted.
+CVE-2021-29428
+
+# Gradle build-time local information disclosure. Not relevant in SGX.
+CVE-2021-29429
+
+# Gradle (build-time) local RCE. Quoting from description:
+#   For this vulnerability to be exploitable, an attacker needs to be able to
+#   set the value of particular environment variables and have those environment
+#   variables be seen by the vulnerable scripts.
+# Which is b*llocks, and in SGX build host is considered trusted anyway.
+CVE-2021-32751
+
+# DoS in Apache Xerces Java (XercesJ) XML parser. Example apps don't parse
+# untrusted XML and DoS is not in scope in SGX threat model.
+CVE-2022-23437
+
+# Bug in nodejs, not affecting the example apps.
+CVE-2022-25883
+
+# Bug in dotnet, not affecting the example app.
+CVE-2022-34716
+
+# Integer Overflow in Vim, which is not used in example apps.
+CVE-2023-2610
+
+# DoS in libtiff. Example apps don't parse untrusted TIFF images, and DoS is not
+# in scope in SGX threat model.
+CVE-2023-2908
+
+# Bug in OpenLDAP, which is not used in example apps.
+CVE-2023-2953
+
+# Local information disclosure in tmpfiles of Guava. Not relevant in SGX
+# enclave.
+CVE-2023-2976
+
+# Null pointer dereference in libtiff. DoS is not in scope in SGX threat model.
+CVE-2023-3316
+
+# Buffer overflow in libtiff causing DoS only. DoS is not in scope in SGX threat
+# model.
+CVE-2023-3618
+
+# Bug in gcc, affecting only aarch64.
+CVE-2023-4039
+
+# Bug in shadow, which is not used in example apps.
+CVE-2023-4641
+
+# Heap Buffer Overflow in Vim, which is not used in example apps.
+CVE-2023-4738
+
+# Use After Free in Vim, which is not used in example apps.
+CVE-2023-4752
+
+# RCE in JGit. Not used in example apps.
+CVE-2023-4759
+
+# Heap Buffer Overflow in Vim, which is not used in example apps.
+CVE-2023-4781
+
+# Heap Buffer Overflow in Vim, which is not used in example apps.
+CVE-2023-5344
+
+# Oracle in libnss RSA implementation. Not used in example apps.
+CVE-2023-5388
+
+# OpenSSL is slow, so whaat.
+CVE-2023-5678
+
+# OpenSSL but only on ppc64. Needs to be re-evaluated when merging IBM's ppc64
+# Gramine fork.
+CVE-2023-6129
+
+# Minerva in libnss, which is not used in example apps.
+CVE-2023-6135
+
+# DoS against OpenSSL parsing untrusted RSA pubkeys. RA-TLS uses EC, not RSA,
+# and example apps don't load pubkeys.
+CVE-2023-6237
+
+# DoS via OOM against libtiff. Example apps do not parse untrusted TIFFs.
+CVE-2023-6277
+
+# DoS against logback. Not used in example apps.
+CVE-2023-6378
+
+# Bug in systemd-resolved, allows for spoofing DNSSEC-signed records (this might
+# result in MitM). Example apps do not perform DNS resolution.
+CVE-2023-7008
+
+# Heap Buffer Overflow in sqlite, which is not used in example apps.
+CVE-2023-7104
+
+# Bug in Python's urllib.parse stdlib module. The scag-client app and example
+# apps are not affected.
+CVE-2023-24329
+
+# DoS in harbuzz, a text rendering engine. Not used in example apps.
+CVE-2023-25193
+
+# Heap buffer overflow causing DoS in libtiff. Not used in example apps, and DoS
+# is not in scope in SGX threat model.
+CVE-2023-25433
+
+# Use after free in libtiff. Not used in example apps.
+CVE-2023-26965
+
+# Buffer overflow in libtiff. Not used in example apps.
+CVE-2023-26966
+
+# Bug in Python's email stdlib module. Not used in this project.
+CVE-2023-27043
+
+# Bug in dotnet, not affecting the example app.
+CVE-2023-29331
+
+# Vulnerability in dmidecode, not even remotely relevant.
+CVE-2023-30630
+
+# CPAN.pm does not verify TLS certs. No Perl modules in base image are installed
+# directly from CPAN, and we have no Perl example.
+CVE-2023-31484
+
+# LDAP injection in Bouncy Castle. Not used in example apps.
+CVE-2023-33201
+
+# DoS in Bouncy Castle. DoS is not in scope in SGX threat model.
+CVE-2023-33202
+
+# Path traversal (possibly RCE) against Gradle via arbitrary file overwrite.
+# Attacker needs control over repo (or HTTPS MitM capability). Upstream
+# classified this "moderate", because they argue the attack "is unlikely [to] go
+# unnoticed." We accept the explanation and the risk.
+CVE-2023-35946
+
+# Bug in gradle  handling tar archives. In SGX model, build host (and app's
+# source) is considered trusted.
+CVE-2023-35947
+
+# Assert in Avahi can be remotely triggered, resulting in DoS. Avahi is not used
+# in SGX enclaves.
+CVE-2023-38469
+
+# Assert in Avahi can be remotely triggered, resulting in DoS. Avahi is not used
+# in SGX enclaves.
+CVE-2023-38470
+
+# Assert in Avahi can be remotely triggered, resulting in DoS. Avahi is not used
+# in SGX enclaves.
+CVE-2023-38471
+
+# Assert in Avahi can be remotely triggered, resulting in DoS. Avahi is not used
+# in SGX enclaves.
+CVE-2023-38472
+
+# Assert in Avahi can be remotely triggered, resulting in DoS. Avahi is not used
+# in SGX enclaves.
+CVE-2023-38473
+
+# Out-of-bounds read in libxml2 legacy API. Example apps do not parse untrusted
+# XML.
+CVE-2023-39615
+
+# Bug in python's TLS server socket implementation. In SCAG, incomming TLS
+# connections are terminated in Nginx.
+CVE-2023-40217
+
+# Bug in path handling in Python's stdlib. Example apps do not accept untrusted
+# path input anywhere.
+CVE-2023-41105
+
+# Bug in gradle parsing XML. In SGX model, build host (and app's source) is
+# considered trusted.
+CVE-2023-42445
+
+# Bug in Apache Commons Compress in TAR parsing. In SGX model, build host (and
+# app's source) is considered trusted.
+CVE-2023-42503
+
+# Bug in nodejs, not affecting the example apps.
+CVE-2023-44270
+
+# Bug in gradle handling symlinks. In SGX model, build host (and app's source)
+# is considered trusted.
+CVE-2023-44387
+
+# Use-after-free in libxml2, unlikely to be exploited (attacker needs to control
+# when memory allocation fails). Example apps don't parse untrusted XML.
+CVE-2023-45322
+
+# Bug in MiniZip, which is not used in example apps.
+CVE-2023-45853
+
+# DoS in werkzeug (can't result in information disclosure). Affects Flask, but
+# we accept it. In SGX threat model DoS is out of scope, because attacker
+# controls OS and can just kill the enclave.
+CVE-2023-46136
+
+# DoS in cryptography.io, specifically in loading PKCS7 blobs. Not used in
+# example apps.
+CVE-2023-49083
+
+# Segfault in ncurses. Ncurses is not a library that would be used in Gramine.
+CVE-2023-50495
+
+# Timing oracle in cryptography.io's RSA decryption. Not used in Gramine or
+# example apps.
+CVE-2023-50782
+
+# Use After Free in sqlite3, which is not used in example apps.
+CVE-2024-0232
+
+# Timing oracle in GnuTLS, in RSA-PSK. Not used in example apps.
+CVE-2024-0553
+
+# Bug in Jinja's xmlattr filter, which is not used in example apps.
+CVE-2024-22195
+
+# DoS in GnuTLS. Not used in example apps, and DoS is not in scope in SGX threat
+# model.
+CVE-2024-0567
