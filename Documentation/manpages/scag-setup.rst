@@ -72,20 +72,12 @@ Express.js
 
     Express.js application main script.
 
-.. option:: --expressjs_internal_port
-
-    Port used by Express.js application.
-
 Koa.js
 ======
 
 .. option:: --application
 
     Koa.js application main script.
-
-.. option:: --koajs_internal_port
-
-    Port used by Koa.js application.
 
 Java JAR files Options
 ======================
