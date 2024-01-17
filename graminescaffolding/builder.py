@@ -411,11 +411,6 @@ class FlaskBuilder(Builder):
         'uwsgi',
         'uwsgi-plugin-python3',
     )
-    extra_files = {
-        'etc/nginx.conf': (
-            'frameworks/{framework}/nginx-uwsgi.conf',
-        ),
-    }
 
 
 class NodejsBuilder(Builder):
@@ -456,22 +451,14 @@ class ExpressjsBuilder(Builder):
     )
     bootstrap_defaults = (
         '--application=index.js',
-        '--expressjs_internal_port=3000',
     )
-    extra_files = {
-        'etc/nginx.conf': (
-            'frameworks/{framework}/nginx-expressjs.conf',
-        ),
-    }
 
     @classmethod
     def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which script is the main one")
-        @utils.gramine_option_prompt('--expressjs_internal_port', required=True,
-            type=int, prompt="Which port is used by expressjs")
-        def click_parser(application, expressjs_internal_port):
+        def click_parser(application):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
@@ -481,7 +468,6 @@ class ExpressjsBuilder(Builder):
                 },
                 cls.framework: {
                     'application': application,
-                    'expressjs_internal_port': expressjs_internal_port,
                 },
             })
         return click_parser
@@ -496,22 +482,14 @@ class KoajsBuilder(Builder):
     )
     bootstrap_defaults = (
         '--application=index.js',
-        '--koajs_internal_port=3000',
     )
-    extra_files = {
-        'etc/nginx.conf': (
-            'frameworks/{framework}/nginx-koajs.conf',
-        ),
-    }
 
     @classmethod
     def cmdline_setup_parser(cls, project_dir, passthrough_env):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which script is the main one")
-        @utils.gramine_option_prompt('--koajs_internal_port', required=True,
-            type=int, prompt="Which port is used by koajs")
-        def click_parser(application, koajs_internal_port):
+        def click_parser(application):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
@@ -521,7 +499,6 @@ class KoajsBuilder(Builder):
                 },
                 cls.framework: {
                     'application': application,
-                    'koajs_internal_port': koajs_internal_port,
                 },
             })
         return click_parser

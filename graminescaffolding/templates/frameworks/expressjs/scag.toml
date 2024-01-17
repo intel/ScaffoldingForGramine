@@ -2,7 +2,6 @@
 
 {% block framework %}
 application = "{{ application }}"
-expressjs_internal_port = "{{ expressjs_internal_port }}"
 {% endblock %}
 
 {#- vim: set ft=jinja : #}
