@@ -2,7 +2,7 @@
 
 {% block framework %}
 application = "{{ application }}"
-expressjs_internal_port = "{{ expressjs_internal_port }}"
+expressjs_internal_unix_domain_socket = "{{ expressjs_internal_unix_domain_socket }}"
 {% endblock %}
 
 {#- vim: set ft=jinja : #}

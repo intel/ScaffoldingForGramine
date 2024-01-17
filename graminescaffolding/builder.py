@@ -456,7 +456,7 @@ class ExpressjsBuilder(Builder):
     )
     bootstrap_defaults = (
         '--application=index.js',
-        '--expressjs_internal_port=3000',
+        '--expressjs_internal_unix_domain_socket=/expressjs.socket',
     )
     extra_files = {
         'etc/nginx.conf': (
@@ -469,9 +469,9 @@ class ExpressjsBuilder(Builder):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which script is the main one")
-        @utils.gramine_option_prompt('--expressjs_internal_port', required=True,
-            type=int, prompt="Which port is used by expressjs")
-        def click_parser(application, expressjs_internal_port):
+        @utils.gramine_option_prompt('--expressjs_internal_unix_domain_socket', required=True,
+            type=str, prompt="Path to a unix domain socket used by expressjs")
+        def click_parser(application, expressjs_internal_unix_domain_socket):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
@@ -481,7 +481,7 @@ class ExpressjsBuilder(Builder):
                 },
                 cls.framework: {
                     'application': application,
-                    'expressjs_internal_port': expressjs_internal_port,
+                    'expressjs_internal_unix_domain_socket': expressjs_internal_unix_domain_socket,
                 },
             })
         return click_parser
@@ -496,7 +496,7 @@ class KoajsBuilder(Builder):
     )
     bootstrap_defaults = (
         '--application=index.js',
-        '--koajs_internal_port=3000',
+        '--koajs_internal_unix_domain_socket=/koajs.socket',
     )
     extra_files = {
         'etc/nginx.conf': (
@@ -509,9 +509,9 @@ class KoajsBuilder(Builder):
         @click.command()
         @utils.gramine_option_prompt('--application', required=True, type=str,
             prompt="Which script is the main one")
-        @utils.gramine_option_prompt('--koajs_internal_port', required=True,
-            type=int, prompt="Which port is used by koajs")
-        def click_parser(application, koajs_internal_port):
+        @utils.gramine_option_prompt('--koajs_internal_unix_domain_socket', required=True,
+            type=str, prompt="Path to a unix domain socket used by koajs")
+        def click_parser(application, koajs_internal_unix_domain_socket):
             return cls(project_dir, {
                 'application': {
                     'framework': cls.framework,
@@ -521,7 +521,7 @@ class KoajsBuilder(Builder):
                 },
                 cls.framework: {
                     'application': application,
-                    'koajs_internal_port': koajs_internal_port,
+                    'koajs_internal_unix_domain_socket': koajs_internal_unix_domain_socket,
                 },
             })
         return click_parser

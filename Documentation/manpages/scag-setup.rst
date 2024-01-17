@@ -72,9 +72,9 @@ Express.js
 
     Express.js application main script.
 
-.. option:: --expressjs_internal_port
+.. option:: --expressjs_internal_unix_domain_socket
 
-    Port used by Express.js application.
+    Unix domain socket used by Express.js application.
 
 Koa.js
 ======
@@ -83,9 +83,9 @@ Koa.js
 
     Koa.js application main script.
 
-.. option:: --koajs_internal_port
+.. option:: --koajs_internal_unix_domain_socket
 
-    Port used by Koa.js application.
+    Unix domain socket used by Koa.js application.
 
 Java JAR files Options
 ======================
