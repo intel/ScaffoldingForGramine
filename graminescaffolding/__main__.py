@@ -248,9 +248,9 @@ def build_step(ctx, project_dir, conf):
 @click.option('--mrsigner',
     help='Specify different mrenclave')
 @click.option('--allow-debug-enclave-insecure/--no-allow-debug-enclave-insecure',
-    help='Allow debug enclave (INSECURE)')
+    help='Allow debug enclave (INSECURE)', default=None)
 @click.option('--allow-outdated-tcb-insecure/--no-allow-outdated-tcb-insecure',
-    help='Allow OUTDATED_TCB (INSECURE)')
+    help='Allow OUTDATED_TCB (INSECURE)', default=None)
 @click.argument('url')
 @click.pass_context
 def client(
@@ -307,8 +307,8 @@ def client(
         resp = _client.request(method, url, verify_cb=verify_cb)
     except _client.AttestationError:
         ctx.fail('attestation failed')
-    except TypeError:
-        ctx.fail('problem with arguments to the verify function')
+    except TypeError as err:
+        ctx.fail(f'problem with arguments to the verify function: {err}')
 
     for chunk in iter(functools.partial(resp.read, 4096), b''):
         output.write(chunk)

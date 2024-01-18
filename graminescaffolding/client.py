@@ -131,7 +131,7 @@ VERIFY_CB['epid'] = verify_epid
 
 
 def verify_maa(cert, *,
-    maa_provider_url,
+    maa_provider_url='https://sharedcus.cus.attest.azure.net',
     mrenclave=None, mrsigner=None, isv_prod_id=None, isv_svn=None,
     allow_debug_enclave_insecure=False, maa_provider_api_version=None,
 ):

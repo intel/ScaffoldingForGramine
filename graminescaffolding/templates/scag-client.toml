@@ -3,3 +3,6 @@ attestation = "dcap"
 
 [sgx]
 mrenclave = "{{ mrenclave }}"
+
+#[dcap]
+#allow_sw_hardening_needed = false
