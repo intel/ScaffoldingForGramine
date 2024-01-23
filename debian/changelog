@@ -1,9 +1,16 @@
-gramine-scaffolding (0.1) unstable-bookworm; urgency=medium
+gramine-scaffolding (0.1) bookworm; urgency=medium
 
-  * First official (numbered) release
-  * Requires gramine 1.6, which is unstable at the time of this writing.
-  * Added support for Node.js
-  * Added support for gramin-sgx-sign plugins
-  * Various usability fixes
+  * First official (numbered) release.
+  * Requires gramine 1.6.
+  * Supports languages and frameworks:
+    - Python (plain)
+    - Python (flask)
+    - Node.js (plain)
+    - Node.js (koa.js)
+    - Node.js (express.js)
+    - Java (prebuilt JAR)
+    - Java (Gradle)
+    - .NET (plain)
+  * Supports signing with gramine-sgx-sign plugins
 
- -- Wojtek Porczyk <woju@invisiblethingslab.com>  Fri, 27 Oct 2023 17:00:00 +0200
+ -- Wojtek Porczyk <woju@invisiblethingslab.com>  Tue, 23 Jan 2024 14:00:00 +0100

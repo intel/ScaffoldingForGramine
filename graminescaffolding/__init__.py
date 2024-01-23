@@ -2,4 +2,4 @@
 # Copyright (C) 2023 Intel Corporation
 #                    Wojtek Porczyk <woju@invisiblethingslab.com>
 
-__version__ = '0a0'
+__version__ = '0.1'
