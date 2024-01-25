@@ -31,14 +31,14 @@ spawn docker run -it --rm \
     --name $name \
     --device /dev/sgx_enclave \
     --volume /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-    --publish 8000:8000 \
+    --publish 8080:8080 \
     "$image"
 
 for {set i 0} {$i < 20} {incr i} {
 	sleep 2
 	spawn docker exec $name sh -c "ss -H -4 -tuln | awk '{ print \$5 }'"
 	expect {
-	    -re "^0.0.0.0:8000" {
+	    -re "^0.0.0.0:8080" {
 		break
 	    }
 	}
@@ -46,7 +46,7 @@ for {set i 0} {$i < 20} {incr i} {
 
 spawn scag-client -C app \
     --allow-outdated-tcb-insecure \
-    https://localhost:8000
+    https://localhost:8080
 
 expect {
     "hello, flask" { set ret 0 }
