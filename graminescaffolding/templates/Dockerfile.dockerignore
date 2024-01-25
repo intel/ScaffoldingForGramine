@@ -1,0 +1,5 @@
+scag.toml
+.scag/*
+
+!.scag/app.manifest.template
+!.scag/etc/
