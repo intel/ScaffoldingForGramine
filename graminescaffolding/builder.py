@@ -428,7 +428,7 @@ class FlaskBuilder(Builder):
         ),
     }
     extra_run_args = (
-        '--publish', '8080:8080',
+        '--publish', '8000:8000',
     )
 
 
@@ -441,7 +441,7 @@ class NodejsBuilder(Builder):
         '--application=app.js',
     )
     extra_run_args = (
-        '--publish', '8080:8080',
+        '--publish', '8000:8000',
     )
 
     @classmethod
@@ -516,7 +516,7 @@ class KoajsBuilder(Builder):
         ),
     }
     extra_run_args = (
-        '--publish', '8080:8080',
+        '--publish', '8000:8000',
     )
 
     @classmethod
@@ -548,7 +548,7 @@ class JavaJARBuilder(Builder):
         '--application=hello_world.jar',
     )
     extra_run_args = (
-        '--publish', '8080:8080',
+        '--publish', '8000:8000',
     )
 
     @classmethod
@@ -582,7 +582,7 @@ class JavaGradleBuilder(Builder):
         '--application=build/libs/hello_world.jar',
     )
     extra_run_args = (
-        '--publish', '8080:8080',
+        '--publish', '8000:8000',
     )
 
     @classmethod
@@ -617,7 +617,7 @@ class DotnetBuilder(Builder):
         '--target=hello_world',
     )
     extra_run_args = (
-        '--publish', '8080:8080',
+        '--publish', '8000:8000',
     )
 
     @classmethod
