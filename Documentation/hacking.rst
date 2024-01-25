@@ -84,12 +84,21 @@ Template variables
 
 ``scag.builder``
     Reference to the instance of `Builder`. `Builder` has useful attributes:
-    `project_dir`, `magic_dir` (also `variables`, but those are primarily
-    available as globals).
+    `project_dir`, `relative_magic_dir` (also `variables`, but those are
+    primarily available as globals).
 
 ``scag.keys_path``
     Path to directory that ships Gramine and Intel release keys. Used in
     ``setup.sh`` hook.
+
+``scag.magic_dir``
+    Directory that contains all files generated during the build phase.
+    This path is constant, so it can be safely used in a Dockerfile.
+
+``scag.builder.relative_magic_dir``
+    The path to a directory that contains all files generated during the build
+    phase. This path is relative to the `project_dir`, so it should be used
+    when actions are performed outside a Docker, or chrooted environment.
 
 ``sgx.*``
     Available as ``sgx.*`` global directory in templates. Used for
