@@ -53,6 +53,10 @@ WANT_FILES = types.MappingProxyType({
     'Dockerfile-final': (
         'Dockerfile-final',
     ),
+
+    '.dockerignore': (
+        '.dockerignore',
+    ),
 })
 
 # TODO allow custom, maybe from variables?
@@ -161,6 +165,7 @@ class Builder:
         templates.globals['scag'] = _templates.globals['scag'].copy()
         templates.globals['scag'].update({
             'builder': self,
+            'MAGIC_DIR': SCAG_MAGIC_DIR,
         })
         templates.globals['sgx'] = self.config.get('sgx',
             types.MappingProxyType({}))
@@ -249,15 +254,18 @@ class Builder:
 
     def create_chroot(self):
         """
-        Step: create chroot using mmdebstrap and signs it
+        Step: create chroot using mmdebstrap
         """
+
+        # XXX: we probably want a force flag to rebuild rootfs
+        if os.path.isfile(self.rootfs_tar):
+            return
+
         subprocess.run([
             'mmdebstrap',
             '--mode=unshare',
             '--keyring', utils.KEYS_PATH / 'trusted.gpg.d',
             '--include', get_gramine_dependency(),
-            *(f'--include={dep}' for dep in self.depends),
-
             '--setup-hook',
                 f'sh {self.magic_dir / "mmdebstrap-hooks/setup.sh"} "$@"',
             '--customize-hook',
@@ -337,7 +345,8 @@ class Builder:
         (self.magic_dir / 'app.sig').write_bytes(sig)
         image2 = self.build_docker_image(
             dockerfile='.scag/Dockerfile-final',
-            buildargs={'FROM': image.id})
+            buildargs={'FROM': image.id},
+        )
 
         mrenclave = extract_mrenclave_from_bytes(sig).hex()
         return image2, mrenclave

@@ -1,0 +1,6 @@
+# Ignore everything
+**
+
+# Besides these files
+!app.manifest.template
+!etc/

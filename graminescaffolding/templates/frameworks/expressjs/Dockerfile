@@ -1,8 +1,7 @@
-{% extends 'mmdebstrap-hooks/customize.sh' %}
+{% extends 'Dockerfile' %}
 
-{% block install %}
-{{ super() }}
-chroot "$1" sh -c 'cd /app; npm install'
+{% block local %}
+RUN npm install
 {% endblock %}
 
 {% block manifest_args -%}

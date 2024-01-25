@@ -2,6 +2,7 @@
 
 set -e
 
-{% block install_keys %}{% endblock %}
+{% block setup %}
+{% endblock %}
 
 {#- vim: set ft=jinja : #}

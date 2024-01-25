@@ -1,5 +1,10 @@
 ARG FROM
-FROM ${FROM}
+FROM ${FROM} as builder
+
+FROM scratch
+
+# We do this copy to remove all other layers information.
+COPY --from=builder / /
 COPY .scag/app.manifest.sgx /app
 COPY .scag/app.sig /app
 
