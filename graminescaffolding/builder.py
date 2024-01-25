@@ -46,11 +46,21 @@ WANT_FILES = types.MappingProxyType({
         'mmdebstrap-hooks/customize.sh',
     ),
 
+    'Dockerfile-rootfs': (
+        'Dockerfile-rootfs',
+    ),
+
     'Dockerfile': (
+        'frameworks/{framework}/Dockerfile',
         'Dockerfile',
     ),
 
+    'Dockerfile.dockerignore': (
+        'Dockerfile.dockerignore',
+    ),
+
     'Dockerfile-final': (
+        'frameworks/{framework}/Dockerfile-final',
         'Dockerfile-final',
     ),
 })
@@ -141,6 +151,7 @@ class Builder:
     @property
     def docker(self):
         if self._docker_client is None:
+            os.environ['DOCKER_BUILDKIT'] = '1'
             self._docker_client = docker.from_env()
         return self._docker_client
 
@@ -161,6 +172,7 @@ class Builder:
         templates.globals['scag'] = _templates.globals['scag'].copy()
         templates.globals['scag'].update({
             'builder': self,
+            'MAGIC_DIR': SCAG_MAGIC_DIR,
         })
         templates.globals['sgx'] = self.config.get('sgx',
             types.MappingProxyType({}))
@@ -219,7 +231,10 @@ class Builder:
         # TODO allow running only some steps
         self.render_templates()
         self.create_chroot()
-        image_unsigned = self.build_docker_image()
+        root_image = self.build_docker_image(
+            dockerfile='.scag/Dockerfile-rootfs')
+        image_unsigned = self.build_docker_image(
+            buildargs={'FROM': root_image.id})
         image, mrenclave = self.sign_docker_image(image_unsigned)
         self.render_client_config(mrenclave)
         return image.id
@@ -249,15 +264,18 @@ class Builder:
 
     def create_chroot(self):
         """
-        Step: create chroot using mmdebstrap and signs it
+        Step: create chroot using mmdebstrap
         """
+
+        # XXX: we probably want a force flag to rebuild rootfs
+        if os.path.isfile(self.rootfs_tar):
+            return
+
         subprocess.run([
             'mmdebstrap',
             '--mode=unshare',
             '--keyring', utils.KEYS_PATH / 'trusted.gpg.d',
             '--include', get_gramine_dependency(),
-            *(f'--include={dep}' for dep in self.depends),
-
             '--setup-hook',
                 f'sh {self.magic_dir / "mmdebstrap-hooks/setup.sh"} "$@"',
             '--customize-hook',
@@ -609,7 +627,6 @@ class DotnetBuilder(Builder):
     framework = 'dotnet'
     depends = (
         'dotnet-sdk-7.0',
-        'ca-certificates',
     )
     bootstrap_defaults = (
         '--build_config=Release',

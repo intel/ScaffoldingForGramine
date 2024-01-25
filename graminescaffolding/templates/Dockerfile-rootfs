@@ -1,0 +1,5 @@
+FROM scratch
+
+{% block add -%}
+ADD .scag/rootfs.tar /
+{% endblock add -%}
