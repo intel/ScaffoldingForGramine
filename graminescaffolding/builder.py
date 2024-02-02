@@ -125,7 +125,6 @@ def extract_mrenclave_from_path(path):
 class Builder:
     framework = None
     extra_files = types.MappingProxyType({})
-    depends = ()
     bootstrap_defaults = ()
     extra_run_args = ()
     BINARY_EXT = (
@@ -402,9 +401,6 @@ class Builder:
 
 class PythonBuilder(Builder):
     framework = 'python_plain'
-    depends = (
-        'python3.11',
-    )
     bootstrap_defaults = (
         '--application=hello_world.py',
     )
@@ -433,13 +429,6 @@ class PythonBuilder(Builder):
 
 class FlaskBuilder(Builder):
     framework = 'flask'
-    depends = (
-        'nginx',
-        'python3-flask',
-        'python3.11',
-        'uwsgi',
-        'uwsgi-plugin-python3',
-    )
     extra_files = {
         'etc/nginx.conf': (
             'frameworks/{framework}/nginx-uwsgi.conf',
@@ -452,9 +441,6 @@ class FlaskBuilder(Builder):
 
 class NodejsBuilder(Builder):
     framework = 'nodejs_plain'
-    depends = (
-        'nodejs',
-    )
     bootstrap_defaults = (
         '--application=app.js',
     )
@@ -484,11 +470,6 @@ class NodejsBuilder(Builder):
 
 class ExpressjsBuilder(Builder):
     framework = 'expressjs'
-    depends = (
-        'nodejs',
-        'npm',
-        'nginx',
-    )
     bootstrap_defaults = (
         '--application=index.js',
     )
@@ -520,11 +501,6 @@ class ExpressjsBuilder(Builder):
 
 class KoajsBuilder(Builder):
     framework = 'koajs'
-    depends = (
-        'nodejs',
-        'npm',
-        'nginx',
-    )
     bootstrap_defaults = (
         '--application=index.js',
     )
@@ -559,9 +535,6 @@ class KoajsBuilder(Builder):
 
 class JavaJARBuilder(Builder):
     framework = 'java_jar'
-    depends = (
-        'openjdk-17-jre-headless',
-    )
     bootstrap_defaults = (
         '--application=hello_world.jar',
     )
@@ -591,11 +564,6 @@ class JavaJARBuilder(Builder):
 
 class JavaGradleBuilder(Builder):
     framework = 'java_gradle'
-    depends = (
-        'gradle',
-        'openjdk-17-jdk',
-        'openjdk-17-jre-headless',
-    )
     bootstrap_defaults = (
         '--application=build/libs/hello_world.jar',
     )
@@ -625,9 +593,6 @@ class JavaGradleBuilder(Builder):
 
 class DotnetBuilder(Builder):
     framework = 'dotnet'
-    depends = (
-        'dotnet-sdk-7.0',
-    )
     bootstrap_defaults = (
         '--build_config=Release',
         '--project_file=hello_world.csproj',
