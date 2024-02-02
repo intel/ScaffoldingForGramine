@@ -1,3 +1,11 @@
+{% macro install() -%}
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+        {{ varargs | map('shquote') | join(' ') }} && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+{% endmacro -%}
+
 {% set gramine = gramine if gramine is defined else 'gramine-sgx' -%}
 
 ARG FROM
@@ -14,15 +22,7 @@ RUN ([ ! -d .scag/etc ] || cp -rT {{ scag.MAGIC_DIR | shquote }}/etc /usr/local/
     rm -Rf .scag
 {% endblock copy -%}
 
-{% block preinstall -%}
-{% endblock preinstall -%}
-
 {% block install -%}
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y \
-        {{ scag.builder.depends | map('shquote') | join(' ') }} && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 {% endblock install -%}
 
 {% block build -%}

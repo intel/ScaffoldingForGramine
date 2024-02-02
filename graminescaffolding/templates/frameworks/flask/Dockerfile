@@ -3,15 +3,12 @@
 {% block install %}
 {{ super() }}
 {{ apt.install(
-    'nodejs',
-    'npm',
     'nginx',
+    'python3-flask',
+    'python3.11',
+    'uwsgi',
+    'uwsgi-plugin-python3',
 ) }}
-RUN npm install
 {% endblock %}
-
-{% block manifest_args -%}
-    -Dapplication={{ application | shquote }}
-{%- endblock %}
 
 {#- vim: set ft=jinja : #}

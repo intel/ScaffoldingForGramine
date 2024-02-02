@@ -104,3 +104,12 @@ Template filters
 ``shquote``
     Quotes shell strings (see :py:func:`shlex.quote`). Useful in
     templates.
+
+Template macros
+---------------
+
+``apt.install(package[, package2[, ...]])``
+    Defined in ``Dockerfile`` template (available also if you
+    ``{% extends 'Dockerfile' %}``). ``{{ apt.install('pkg1', 'pkg2', ...)``
+    will emit ``RUN apt-get ...`` invocation that will correctly install the
+    set of packages given as arguments.

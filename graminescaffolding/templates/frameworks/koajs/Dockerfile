@@ -2,6 +2,11 @@
 
 {% block install %}
 {{ super() }}
+{{ apt.install(
+    'nodejs',
+    'npm',
+    'nginx',
+) }}
 RUN npm install
 {% endblock %}
 
