@@ -478,6 +478,9 @@ class ExpressjsBuilder(Builder):
             'frameworks/nginx/nginx.conf',
         ),
     }
+    extra_run_args = (
+        '--publish', '8080:8080',
+    )
 
     @classmethod
     def cmdline_setup_parser(cls, project_dir, passthrough_env):
@@ -566,9 +569,6 @@ class JavaGradleBuilder(Builder):
     framework = 'java_gradle'
     bootstrap_defaults = (
         '--application=build/libs/hello_world.jar',
-    )
-    extra_run_args = (
-        '--publish', '8080:8080',
     )
 
     @classmethod
