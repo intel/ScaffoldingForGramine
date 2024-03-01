@@ -1,0 +1,12 @@
+# https://aquasecurity.github.io/trivy/v0.48/docs/references/configuration/config-file/
+
+severity:
+  - MEDIUM
+  - HIGH
+  - CRITICAL
+exit-code: 1
+scan:
+  scanners:
+    - vuln
+    - misonfig
+    - secret
