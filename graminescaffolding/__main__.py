@@ -158,6 +158,11 @@ def setup(ctx, framework, project_dir, bootstrap, passthrough_env, args):
     framework = gramine_load_framework(framework)
     parser = framework.cmdline_setup_parser(project_dir, passthrough_env)
     if bootstrap:
+        if len(args) > 0:
+            print(
+                'When using the bootstrap option, all framework-specific '
+                'options will be ignored.', file=sys.stderr
+            )
         args = framework.bootstrap_defaults
     if getattr(ctx.command, 'prompts_enabled', False):
         parser = utils.gramine_enable_prompts(parser)
