@@ -67,7 +67,6 @@ sgx.trusted_files = [
   "file:{{ nodejs }}",
   "file:/usr/local/etc/nginx.conf",
 
-  "file:/lib/x86_64-linux-gnu/",
   "file:/usr/lib/x86_64-linux-gnu/",
 
   "file:/app/",

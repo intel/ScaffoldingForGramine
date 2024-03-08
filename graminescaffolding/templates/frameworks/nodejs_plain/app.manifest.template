@@ -21,7 +21,6 @@ sys.insecure__allow_eventfd = true
 
 fs.mounts = [
   { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
-  { path = "/lib/x86_64-linux-gnu", uri = "file:/lib/x86_64-linux-gnu" },
   { path = "/usr/lib/x86_64-linux-gnu", uri = "file:/usr/lib/x86_64-linux-gnu" },
   { path = "/usr/share/nodejs", uri = "file:/usr/share/nodejs" },
   { path = "{{ nodejs }}", uri = "file:{{ nodejs }}" },
@@ -40,7 +39,6 @@ sgx.max_threads = 32
 sgx.trusted_files = [
   "file:{{ gramine.libos }}",
   "file:{{ gramine.runtimedir() }}/",
-  "file:/lib/x86_64-linux-gnu/",
   "file:/usr/lib/x86_64-linux-gnu/",
   "file:/usr/share/nodejs/",
   "file:{{ nodejs }}",
